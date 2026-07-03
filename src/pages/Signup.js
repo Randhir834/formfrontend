@@ -18,7 +18,9 @@ function Signup({ setUser }) {
     setLoading(true);
 
     try {
+      console.log('Attempting signup...');
       const response = await signup(formData);
+      console.log('Signup response:', response);
       const { token, ...userData } = response.data.data;
       
       localStorage.setItem('token', token);
@@ -27,7 +29,9 @@ function Signup({ setUser }) {
 
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.message || 'Signup failed. Please try again.');
+      console.error('Signup error:', err);
+      const errorMessage = err.response?.data?.message || err.message || 'Signup failed. Please check your connection and try again.';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

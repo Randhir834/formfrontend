@@ -1,6 +1,9 @@
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
+// Use environment variable or fallback to production backend
+const API_URL = process.env.REACT_APP_API_URL || 'https://formbackend-1-v0n3.onrender.com/api';
+
+console.log('API_URL configured as:', API_URL);
 
 const api = axios.create({
   baseURL: API_URL,

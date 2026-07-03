@@ -18,7 +18,9 @@ function Login({ setUser }) {
     setLoading(true);
 
     try {
+      console.log('Attempting login...');
       const response = await login(formData);
+      console.log('Login response:', response);
       const { token, ...userData } = response.data.data;
       
       localStorage.setItem('token', token);
@@ -32,7 +34,9 @@ function Login({ setUser }) {
         navigate('/dashboard');
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed. Please try again.');
+      console.error('Login error:', err);
+      const errorMessage = err.response?.data?.message || err.message || 'Login failed. Please check your connection and try again.';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
