@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getForm, updateFormStatus } from '../utils/api';
+import { getForm, updateFormStatus, getImageUrl } from '../utils/api';
 
 function AdminFormDetail() {
   const { id } = useParams();
@@ -136,7 +136,7 @@ function AdminFormDetail() {
                 <h3 style={{ color: '#111827', marginBottom: '20px', fontSize: '17px', fontWeight: '600' }}>Reference Images</h3>
                 <div className="image-preview">
                   {form.referenceImages.map((img, index) => (
-                    <img key={index} src={`http://localhost:5001${img.imageUrl}`} alt={`Reference ${index + 1}`} style={{ borderRadius: '12px', border: '1px solid #e5e7eb' }} />
+                    <img key={index} src={getImageUrl(img.imageUrl)} alt={`Reference ${index + 1}`} style={{ borderRadius: '12px', border: '1px solid #e5e7eb' }} />
                   ))}
                 </div>
               </div>
@@ -169,7 +169,7 @@ function AdminFormDetail() {
                       {update.progress_images && update.progress_images.length > 0 && (
                         <div className="image-preview" style={{ marginTop: '16px' }}>
                           {update.progress_images.map((img, idx) => (
-                            <img key={idx} src={`http://localhost:5001${img.imageUrl}`} alt={`Progress ${idx + 1}`} style={{ borderRadius: '12px', border: '1px solid #e5e7eb' }} />
+                            <img key={idx} src={getImageUrl(img.imageUrl)} alt={`Progress ${idx + 1}`} style={{ borderRadius: '12px', border: '1px solid #e5e7eb' }} />
                           ))}
                         </div>
                       )}
@@ -200,7 +200,7 @@ function AdminFormDetail() {
                             {feedback.feedback_images && feedback.feedback_images.length > 0 && (
                               <div className="image-preview" style={{ marginTop: '12px' }}>
                                 {feedback.feedback_images.map((img, imgIdx) => (
-                                  <img key={imgIdx} src={`http://localhost:5001${img.imageUrl}`} alt={`Feedback ${imgIdx + 1}`} style={{ borderRadius: '8px', border: '1px solid #e5e7eb', maxHeight: '150px' }} />
+                                  <img key={imgIdx} src={getImageUrl(img.imageUrl)} alt={`Feedback ${imgIdx + 1}`} style={{ borderRadius: '8px', border: '1px solid #e5e7eb', maxHeight: '150px' }} />
                                 ))}
                               </div>
                             )}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getForm, updateForm } from '../utils/api';
+import { getForm, updateForm, getImageUrl } from '../utils/api';
 
 function FormEdit() {
   const navigate = useNavigate();
@@ -664,7 +664,7 @@ function FormEdit() {
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '15px', marginTop: '15px' }}>
                     {displayImages.map((img, index) => (
                       <div key={index} style={{ position: 'relative' }}>
-                        <img src={`http://localhost:5001${img.imageUrl}`} alt={`Reference ${index + 1}`} style={{ width: '100%', height: '150px', objectFit: 'cover', borderRadius: '12px', border: '1px solid #e5e7eb' }} />
+                        <img src={getImageUrl(img.imageUrl)} alt={`Reference ${index + 1}`} style={{ width: '100%', height: '150px', objectFit: 'cover', borderRadius: '12px', border: '1px solid #e5e7eb' }} />
                         <button
                           type="button"
                           onClick={() => handleDeleteExistingImage(img.filename)}

@@ -17,8 +17,23 @@ const getApiUrl = () => {
 
 const API_URL = getApiUrl();
 
+// Extract base URL (without /api) for image URLs
+export const getBackendUrl = () => {
+  return API_URL.replace('/api', '');
+};
+
+// Helper function to get full image URL
+export const getImageUrl = (imagePath) => {
+  if (!imagePath) return '';
+  // If it's already a full URL, return it
+  if (imagePath.startsWith('http')) return imagePath;
+  // Otherwise, prepend the backend URL
+  return `${getBackendUrl()}${imagePath}`;
+};
+
 // Log the final API URL being used
 console.log('🌐 API Base URL configured as:', API_URL);
+console.log('🖼️  Backend URL for images:', getBackendUrl());
 
 const api = axios.create({
   baseURL: API_URL,
