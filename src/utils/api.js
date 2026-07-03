@@ -19,8 +19,14 @@ api.interceptors.request.use((config) => {
 });
 
 // Auth APIs
-export const signup = (data) => api.post('/auth/signup', data);
-export const login = (data) => api.post('/auth/login', data);
+export const signup = (data) => {
+  console.log('Signup URL:', `${API_URL}/auth/signup`);
+  return api.post('/auth/signup', data);
+};
+export const login = (data) => {
+  console.log('Login URL:', `${API_URL}/auth/login`);
+  return api.post('/auth/login', data);
+};
 export const getProfile = () => api.get('/auth/me');
 
 // Form APIs

@@ -18,7 +18,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "prebuild": "echo 'Building with REACT_APP_API_URL=' $REACT_APP_API_URL"
   },
   "eslintConfig": {
     "extends": [
