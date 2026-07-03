@@ -227,9 +227,8 @@ function AdminFormDetail() {
                 >
                   <option value="submitted">Submitted</option>
                   <option value="in-progress">In Progress</option>
-                  <option value="review">Review</option>
                   <option value="completed">Completed</option>
-                  <option value="cancelled">Cancelled</option>
+                  <option value="rejected">Rejected</option>
                 </select>
               </div>
 

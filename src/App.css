@@ -198,19 +198,13 @@ body {
   border: 1px solid #bfdbfe;
 }
 
-.status-review {
-  background: #fce7f3;
-  color: #831843;
-  border: 1px solid #fbcfe8;
-}
-
 .status-completed {
   background: #d1fae5;
   color: #065f46;
   border: 1px solid #a7f3d0;
 }
 
-.status-cancelled {
+.status-rejected {
   background: #fee2e2;
   color: #991b1b;
   border: 1px solid #fecaca;
