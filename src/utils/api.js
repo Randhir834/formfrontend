@@ -1,32 +1,82 @@
 import axios from 'axios';
 
-// Use environment variable or fallback to production backend
-const API_URL = process.env.REACT_APP_API_URL || 'https://formbackend-1-v0n3.onrender.com/api';
+// Backend API URL Configuration
+// Priority: Environment Variable > Hardcoded Production URL
+const getApiUrl = () => {
+  // Check if environment variable exists
+  if (process.env.REACT_APP_API_URL) {
+    console.log('✅ Using REACT_APP_API_URL from environment:', process.env.REACT_APP_API_URL);
+    return process.env.REACT_APP_API_URL;
+  }
+  
+  // Fallback to production URL
+  const productionUrl = 'https://formbackend-1-v0n3.onrender.com/api';
+  console.log('⚠️  REACT_APP_API_URL not set, using fallback:', productionUrl);
+  return productionUrl;
+};
 
-console.log('API_URL configured as:', API_URL);
+const API_URL = getApiUrl();
+
+// Log the final API URL being used
+console.log('🌐 API Base URL configured as:', API_URL);
 
 const api = axios.create({
   baseURL: API_URL,
+  timeout: 30000, // 30 second timeout
+  headers: {
+    'Content-Type': 'application/json'
+  }
 });
 
 // Add token to requests
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    console.log('📤 API Request:', config.method.toUpperCase(), config.url);
+    return config;
+  },
+  (error) => {
+    console.error('❌ Request Error:', error);
+    return Promise.reject(error);
   }
-  return config;
-});
+);
+
+// Add response interceptor for better error handling
+api.interceptors.response.use(
+  (response) => {
+    console.log('📥 API Response:', response.config.url, '- Status:', response.status);
+    return response;
+  },
+  (error) => {
+    if (error.response) {
+      console.error('❌ API Error Response:', {
+        url: error.config?.url,
+        status: error.response.status,
+        message: error.response.data?.message || error.message
+      });
+    } else if (error.request) {
+      console.error('❌ Network Error - No response received:', error.message);
+    } else {
+      console.error('❌ Request Setup Error:', error.message);
+    }
+    return Promise.reject(error);
+  }
+);
 
 // Auth APIs
 export const signup = (data) => {
-  console.log('Signup URL:', `${API_URL}/auth/signup`);
+  console.log('🔐 Signup request to:', `${API_URL}/auth/signup`);
   return api.post('/auth/signup', data);
 };
+
 export const login = (data) => {
-  console.log('Login URL:', `${API_URL}/auth/login`);
+  console.log('🔐 Login request to:', `${API_URL}/auth/login`);
   return api.post('/auth/login', data);
 };
+
 export const getProfile = () => api.get('/auth/me');
 
 // Form APIs
