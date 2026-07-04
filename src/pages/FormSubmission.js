@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { submitForm } from '../utils/api';
 
@@ -11,24 +11,24 @@ function FormSubmission() {
   const [formData, setFormData] = useState({
     clientInfo: {
       companyName: '', brandName: '', contactPerson: '', mobileNumber: '',
-      email: '', fssaiNumber: '', manufacturerName: '', manufacturerAddress: ''
+      email: '', fssaiNumber: '', manufacturerName: '', manufacturerAddress: '',
+      marketedBy: '', marketedByAddress: ''
     },
     productInfo: {
       productName: '', productCategory: '', productVariant: '', productWeight: '',
       productDimensions: '', mrp: '', shelfLife: '', storageInstructions: '',
-      ingredients: '', nutritionalFacts: '', allergenInformation: '', directionsForUse: '', targetAgeGroup: ''
+      ingredients: '', nutritionalFacts: '', allergenInformation: '', directionsForUse: ''
     },
     targetCustomer: {
-      targetGender: '', targetAge: '', targetIncome: '', targetLocation: '',
-      buyerChannel: '', buyerSegment: '', businessModel: '', problemSolved: ''
+      targetGender: '', targetIncome: '', targetLocation: '',
+      buyerChannel: '', buyerSegment: '', businessModel: ''
     },
     packageSpec: {
       packageType: '', finish: [], specialEffects: [], printing: [], packageNotes: ''
     },
     designDirection: {
       primaryColor: '', secondaryColor: '', accentColor: '',
-      colorsToAvoid: '', fontsToAvoid: '', preferredFontStyle: '', visualStyle: '',
-      designDensity: '', brandPerception: '', designAesthetic: '', designInspiration: ''
+      colorsToAvoid: '', designDensity: '', brandPerception: '', designAesthetic: '', designInspiration: ''
     },
     timeline: {
       launchDate: '', printingDate: '', expectedDelivery: '', urgent: '', timelineNotes: ''
@@ -157,8 +157,8 @@ function FormSubmission() {
                     placeholder="email@example.com" />
                 </div>
                 <div className="form-group">
-                  <label>FSSAI Number *</label>
-                  <input required value={formData.clientInfo.fssaiNumber}
+                  <label>FSSAI Number</label>
+                  <input value={formData.clientInfo.fssaiNumber}
                     onChange={(e) => handleInputChange('clientInfo', 'fssaiNumber', e.target.value)}
                     placeholder="12345678901234" />
                 </div>
@@ -173,6 +173,18 @@ function FormSubmission() {
                   <textarea required value={formData.clientInfo.manufacturerAddress}
                     onChange={(e) => handleInputChange('clientInfo', 'manufacturerAddress', e.target.value)}
                     placeholder="Enter complete manufacturer address" rows="3" />
+                </div>
+                <div className="form-group">
+                  <label>Marketed By *</label>
+                  <input required value={formData.clientInfo.marketedBy}
+                    onChange={(e) => handleInputChange('clientInfo', 'marketedBy', e.target.value)}
+                    placeholder="Enter marketed by name" />
+                </div>
+                <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+                  <label>Marketed By Address *</label>
+                  <textarea required value={formData.clientInfo.marketedByAddress}
+                    onChange={(e) => handleInputChange('clientInfo', 'marketedByAddress', e.target.value)}
+                    placeholder="Enter complete marketed by address" rows="3" />
                 </div>
               </div>
             </div>
@@ -206,8 +218,8 @@ function FormSubmission() {
                   </select>
                 </div>
                 <div className="form-group">
-                  <label>Product Variant *</label>
-                  <input required value={formData.productInfo.productVariant}
+                  <label>Product Variant</label>
+                  <input value={formData.productInfo.productVariant}
                     onChange={(e) => handleInputChange('productInfo', 'productVariant', e.target.value)}
                     placeholder="e.g., Chocolate, Vanilla, Mango" />
                 </div>
@@ -230,20 +242,14 @@ function FormSubmission() {
                     placeholder="Enter MRP" />
                 </div>
                 <div className="form-group">
-                  <label>Shelf Life *</label>
-                  <input required value={formData.productInfo.shelfLife}
+                  <label>Shelf Life</label>
+                  <input value={formData.productInfo.shelfLife}
                     onChange={(e) => handleInputChange('productInfo', 'shelfLife', e.target.value)}
                     placeholder="e.g., 12 months, 6 months" />
                 </div>
-                <div className="form-group">
-                  <label>Target Age Group *</label>
-                  <input required value={formData.productInfo.targetAgeGroup}
-                    onChange={(e) => handleInputChange('productInfo', 'targetAgeGroup', e.target.value)}
-                    placeholder="e.g., 5-12 years, 18+, All ages" />
-                </div>
                 <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-                  <label>Storage Instructions *</label>
-                  <textarea required value={formData.productInfo.storageInstructions}
+                  <label>Storage Instructions</label>
+                  <textarea value={formData.productInfo.storageInstructions}
                     onChange={(e) => handleInputChange('productInfo', 'storageInstructions', e.target.value)}
                     placeholder="e.g., Store in a cool, dry place away from direct sunlight" rows="2" />
                 </div>
@@ -260,8 +266,8 @@ function FormSubmission() {
                     placeholder="Per serving: Energy, Protein, Carbs, Fat, Fiber, etc." rows="4" />
                 </div>
                 <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-                  <label>Allergen Information *</label>
-                  <textarea required value={formData.productInfo.allergenInformation}
+                  <label>Allergen Information</label>
+                  <textarea value={formData.productInfo.allergenInformation}
                     onChange={(e) => handleInputChange('productInfo', 'allergenInformation', e.target.value)}
                     placeholder="e.g., Contains nuts, dairy, gluten. May contain traces of..." rows="2" />
                 </div>
@@ -292,14 +298,8 @@ function FormSubmission() {
                   </select>
                 </div>
                 <div className="form-group">
-                  <label>Age Group *</label>
-                  <input required value={formData.targetCustomer.targetAge}
-                    onChange={(e) => handleInputChange('targetCustomer', 'targetAge', e.target.value)}
-                    placeholder="e.g., 18-25, 30-45, 50+" />
-                </div>
-                <div className="form-group">
-                  <label>Income Level *</label>
-                  <select required value={formData.targetCustomer.targetIncome}
+                  <label>Income Level</label>
+                  <select value={formData.targetCustomer.targetIncome}
                     onChange={(e) => handleInputChange('targetCustomer', 'targetIncome', e.target.value)}>
                     <option value="">Select Income Level</option>
                     <option value="low">Low Income (&lt; ₹3L/year)</option>
@@ -347,12 +347,6 @@ function FormSubmission() {
                     <option value="wholesale">Wholesale (B2B)</option>
                     <option value="both">Both Retail & Wholesale</option>
                   </select>
-                </div>
-                <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-                  <label>What problem does your product solve? *</label>
-                  <textarea required value={formData.targetCustomer.problemSolved}
-                    onChange={(e) => handleInputChange('targetCustomer', 'problemSolved', e.target.value)}
-                    placeholder="Describe the main problem or need your product addresses" rows="3" />
                 </div>
               </div>
             </div>
@@ -438,9 +432,9 @@ function FormSubmission() {
               </h2>
               <div className="grid-2">
                 <div className="form-group">
-                  <label>Primary Color *</label>
+                  <label>Primary Color</label>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <input type="color" required value={formData.designDirection.primaryColor}
+                    <input type="color" value={formData.designDirection.primaryColor}
                       onChange={(e) => handleInputChange('designDirection', 'primaryColor', e.target.value)}
                       style={{ width: '60px', height: '40px' }} />
                     <input type="text" value={formData.designDirection.primaryColor}
@@ -449,9 +443,9 @@ function FormSubmission() {
                   </div>
                 </div>
                 <div className="form-group">
-                  <label>Secondary Color *</label>
+                  <label>Secondary Color</label>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <input type="color" required value={formData.designDirection.secondaryColor}
+                    <input type="color" value={formData.designDirection.secondaryColor}
                       onChange={(e) => handleInputChange('designDirection', 'secondaryColor', e.target.value)}
                       style={{ width: '60px', height: '40px' }} />
                     <input type="text" value={formData.designDirection.secondaryColor}
@@ -460,9 +454,9 @@ function FormSubmission() {
                   </div>
                 </div>
                 <div className="form-group">
-                  <label>Accent Color *</label>
+                  <label>Accent Color</label>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <input type="color" required value={formData.designDirection.accentColor}
+                    <input type="color" value={formData.designDirection.accentColor}
                       onChange={(e) => handleInputChange('designDirection', 'accentColor', e.target.value)}
                       style={{ width: '60px', height: '40px' }} />
                     <input type="text" value={formData.designDirection.accentColor}
@@ -471,42 +465,14 @@ function FormSubmission() {
                   </div>
                 </div>
                 <div className="form-group">
-                  <label>Colors to Avoid *</label>
-                  <input required value={formData.designDirection.colorsToAvoid}
+                  <label>Colors to Avoid</label>
+                  <input value={formData.designDirection.colorsToAvoid}
                     onChange={(e) => handleInputChange('designDirection', 'colorsToAvoid', e.target.value)}
                     placeholder="e.g., Red, Neon colors, Dark brown" />
                 </div>
                 <div className="form-group">
-                  <label>Fonts to Avoid *</label>
-                  <input required value={formData.designDirection.fontsToAvoid}
-                    onChange={(e) => handleInputChange('designDirection', 'fontsToAvoid', e.target.value)}
-                    placeholder="e.g., Comic Sans, Cursive fonts" />
-                </div>
-                <div className="form-group">
-                  <label>Preferred Font Style *</label>
-                  <select required value={formData.designDirection.preferredFontStyle}
-                    onChange={(e) => handleInputChange('designDirection', 'preferredFontStyle', e.target.value)}>
-                    <option value="">Select Font Style</option>
-                    <option value="serif">Serif (Traditional)</option>
-                    <option value="sans-serif">Sans-Serif (Modern)</option>
-                    <option value="script">Script/Handwritten</option>
-                    <option value="display">Display/Decorative</option>
-                    <option value="monospace">Monospace</option>
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label>Visual Style *</label>
-                  <select required value={formData.designDirection.visualStyle}
-                    onChange={(e) => handleInputChange('designDirection', 'visualStyle', e.target.value)}>
-                    <option value="">Select Style</option>
-                    <option value="illustration">Illustration</option>
-                    <option value="photo">Photography</option>
-                    <option value="both">Both Illustration & Photo</option>
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label>Design Density *</label>
-                  <select required value={formData.designDirection.designDensity}
+                  <label>Design Density</label>
+                  <select value={formData.designDirection.designDensity}
                     onChange={(e) => handleInputChange('designDirection', 'designDensity', e.target.value)}>
                     <option value="">Select Density</option>
                     <option value="minimal">Minimal (Clean & Simple)</option>
@@ -515,8 +481,8 @@ function FormSubmission() {
                   </select>
                 </div>
                 <div className="form-group">
-                  <label>Brand Perception *</label>
-                  <select required value={formData.designDirection.brandPerception}
+                  <label>Brand Perception</label>
+                  <select value={formData.designDirection.brandPerception}
                     onChange={(e) => handleInputChange('designDirection', 'brandPerception', e.target.value)}>
                     <option value="">Select Perception</option>
                     <option value="luxury">Luxury/Premium</option>
@@ -525,8 +491,8 @@ function FormSubmission() {
                   </select>
                 </div>
                 <div className="form-group">
-                  <label>Design Aesthetic *</label>
-                  <select required value={formData.designDirection.designAesthetic}
+                  <label>Design Aesthetic</label>
+                  <select value={formData.designDirection.designAesthetic}
                     onChange={(e) => handleInputChange('designDirection', 'designAesthetic', e.target.value)}>
                     <option value="">Select Aesthetic</option>
                     <option value="modern">Modern/Contemporary</option>
@@ -535,7 +501,7 @@ function FormSubmission() {
                   </select>
                 </div>
                 <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-                  <label>Design Inspiration (Optional)</label>
+                  <label>Design Inspiration</label>
                   <textarea value={formData.designDirection.designInspiration}
                     onChange={(e) => handleInputChange('designDirection', 'designInspiration', e.target.value)}
                     placeholder="Describe any specific design inspirations, reference brands, or styles you like" rows="3" />

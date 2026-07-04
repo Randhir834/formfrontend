@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Backend API URL Configuration
-// Priority: Environment Variable > Hardcoded Production URL
+// Priority: Environment Variable > Fallback
 const getApiUrl = () => {
   // Check if environment variable exists
   if (process.env.REACT_APP_API_URL) {
@@ -9,10 +9,10 @@ const getApiUrl = () => {
     return process.env.REACT_APP_API_URL;
   }
   
-  // Fallback to production URL
-  const productionUrl = 'https://formbackend-1-v0n3.onrender.com/api';
-  console.log('⚠️  REACT_APP_API_URL not set, using fallback:', productionUrl);
-  return productionUrl;
+  // Fallback to local development URL
+  const fallbackUrl = 'http://localhost:5001/api';
+  console.warn('⚠️  REACT_APP_API_URL not set, using fallback:', fallbackUrl);
+  return fallbackUrl;
 };
 
 const API_URL = getApiUrl();
@@ -25,10 +25,22 @@ export const getBackendUrl = () => {
 // Helper function to get full image URL
 export const getImageUrl = (imagePath) => {
   if (!imagePath) return '';
-  // If it's already a full URL, return it
+  
+  // If it's already a full URL (Supabase Storage URL), return it
   if (imagePath.startsWith('http')) return imagePath;
-  // Otherwise, prepend the backend URL
-  return `${getBackendUrl()}${imagePath}`;
+  
+  // Handle old local uploads format (backward compatibility)
+  if (imagePath.startsWith('/uploads')) {
+    return `${getBackendUrl()}${imagePath}`;
+  }
+  
+  // For image objects with publicUrl property
+  if (typeof imagePath === 'object' && imagePath.publicUrl) {
+    return imagePath.publicUrl;
+  }
+  
+  // Default: assume it's a Supabase path
+  return imagePath;
 };
 
 // Log the final API URL being used

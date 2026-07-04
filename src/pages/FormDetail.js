@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getForm, submitFeedback, getImageUrl } from '../utils/api';
 
@@ -136,6 +136,28 @@ function FormDetail() {
                 <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '4px', fontWeight: '500' }}>Email</p>
                 <p style={{ fontSize: '15px', color: '#111827' }}>{form.clientInfo.email}</p>
               </div>
+              {form.clientInfo.fssaiNumber && (
+                <div>
+                  <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '4px', fontWeight: '500' }}>FSSAI Number</p>
+                  <p style={{ fontSize: '15px', color: '#111827' }}>{form.clientInfo.fssaiNumber}</p>
+                </div>
+              )}
+              <div>
+                <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '4px', fontWeight: '500' }}>Manufacturer Name</p>
+                <p style={{ fontSize: '15px', color: '#111827' }}>{form.clientInfo.manufacturerName}</p>
+              </div>
+              <div style={{ gridColumn: '1 / -1' }}>
+                <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '4px', fontWeight: '500' }}>Manufacturer Address</p>
+                <p style={{ fontSize: '15px', color: '#111827' }}>{form.clientInfo.manufacturerAddress}</p>
+              </div>
+              <div>
+                <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '4px', fontWeight: '500' }}>Marketed By</p>
+                <p style={{ fontSize: '15px', color: '#111827' }}>{form.clientInfo.marketedBy}</p>
+              </div>
+              <div style={{ gridColumn: '1 / -1' }}>
+                <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '4px', fontWeight: '500' }}>Marketed By Address</p>
+                <p style={{ fontSize: '15px', color: '#111827' }}>{form.clientInfo.marketedByAddress}</p>
+              </div>
             </div>
           </div>
 
@@ -166,7 +188,7 @@ function FormDetail() {
               <h3 style={{ color: '#111827', marginBottom: '20px', fontSize: '17px', fontWeight: '600' }}>Reference Images</h3>
               <div className="image-preview">
                 {form.referenceImages.map((img, index) => (
-                  <img key={index} src={getImageUrl(img.imageUrl)} alt={`Reference ${index + 1}`} style={{ borderRadius: '12px', border: '1px solid #e5e7eb' }} />
+                  <img key={index} src={getImageUrl(img.publicUrl || img.imageUrl)} alt={`Reference ${index + 1}`} style={{ borderRadius: '12px', border: '1px solid #e5e7eb' }} />
                 ))}
               </div>
             </div>
@@ -199,7 +221,7 @@ function FormDetail() {
                     {update.progress_images && update.progress_images.length > 0 && (
                       <div className="image-preview" style={{ marginTop: '16px' }}>
                         {update.progress_images.map((img, idx) => (
-                          <img key={idx} src={getImageUrl(img.imageUrl)} alt={`Progress ${idx + 1}`} style={{ borderRadius: '12px', border: '1px solid #e5e7eb' }} />
+                          <img key={idx} src={getImageUrl(img.publicUrl || img.imageUrl)} alt={`Progress ${idx + 1}`} style={{ borderRadius: '12px', border: '1px solid #e5e7eb' }} />
                         ))}
                       </div>
                     )}
@@ -228,7 +250,7 @@ function FormDetail() {
                           {feedback.feedback_images && feedback.feedback_images.length > 0 && (
                             <div className="image-preview" style={{ marginTop: '12px' }}>
                               {feedback.feedback_images.map((img, imgIdx) => (
-                                <img key={imgIdx} src={getImageUrl(img.imageUrl)} alt={`Feedback ${imgIdx + 1}`} style={{ borderRadius: '8px', border: '1px solid #e5e7eb', maxHeight: '150px' }} />
+                                <img key={imgIdx} src={getImageUrl(img.publicUrl || img.imageUrl)} alt={`Feedback ${imgIdx + 1}`} style={{ borderRadius: '8px', border: '1px solid #e5e7eb', maxHeight: '150px' }} />
                               ))}
                             </div>
                           )}
