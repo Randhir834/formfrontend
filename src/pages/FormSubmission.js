@@ -24,7 +24,7 @@ function FormSubmission() {
       buyerChannel: '', buyerSegment: '', businessModel: ''
     },
     packageSpec: {
-      packageType: '', finish: [], specialEffects: [], printing: [], packageNotes: ''
+      packageType: '', packageNotes: ''
     },
     designDirection: {
       primaryColor: '', secondaryColor: '', accentColor: '',
@@ -369,51 +369,6 @@ function FormSubmission() {
                   <option value="tube">Tube</option>
                   <option value="jar">Jar</option>
                 </select>
-              </div>
-
-              <div className="form-group" style={{ marginBottom: '20px' }}>
-                <label>Finish (Select all that apply)</label>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px', marginTop: '10px' }}>
-                  {['Matte', 'Gloss', 'Soft Touch'].map(finish => (
-                    <label key={finish} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-                      <input type="checkbox" 
-                        checked={formData.packageSpec.finish.includes(finish)}
-                        onChange={(e) => handleCheckboxChange('packageSpec', 'finish', finish, e.target.checked)}
-                        style={{ marginRight: '8px' }} />
-                      {finish}
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              <div className="form-group" style={{ marginBottom: '20px' }}>
-                <label>Special Effects (Select all that apply)</label>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px', marginTop: '10px' }}>
-                  {['UV', 'Spot UV', 'Emboss', 'Deboss', 'Gold Foil', 'Silver Foil'].map(effect => (
-                    <label key={effect} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-                      <input type="checkbox" 
-                        checked={formData.packageSpec.specialEffects.includes(effect)}
-                        onChange={(e) => handleCheckboxChange('packageSpec', 'specialEffects', effect, e.target.checked)}
-                        style={{ marginRight: '8px' }} />
-                      {effect}
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              <div className="form-group" style={{ marginBottom: '20px' }}>
-                <label>Printing Type (Select all that apply)</label>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px', marginTop: '10px' }}>
-                  {['CMYK', 'Pantone'].map(print => (
-                    <label key={print} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-                      <input type="checkbox" 
-                        checked={formData.packageSpec.printing.includes(print)}
-                        onChange={(e) => handleCheckboxChange('packageSpec', 'printing', print, e.target.checked)}
-                        style={{ marginRight: '8px' }} />
-                      {print}
-                    </label>
-                  ))}
-                </div>
               </div>
 
               <div className="form-group">
