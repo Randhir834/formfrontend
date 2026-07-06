@@ -139,16 +139,206 @@ function AdminFormDetail() {
                   <p style={{ fontSize: '15px', color: '#111827', fontWeight: '500' }}>{form.productInfo.productName}</p>
                 </div>
                 <div>
-                  <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '4px', fontWeight: '500' }}>Category</p>
+                  <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '4px', fontWeight: '500' }}>Product Name (Category)</p>
                   <p style={{ fontSize: '15px', color: '#111827' }}>{form.productInfo.productCategory}</p>
                 </div>
                 <div>
                   <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '4px', fontWeight: '500' }}>Variant</p>
-                  <p style={{ fontSize: '15px', color: '#111827' }}>{form.productInfo.productVariant}</p>
+                  <p style={{ fontSize: '15px', color: '#111827' }}>{form.productInfo.productVariant || 'N/A'}</p>
+                </div>
+                <div>
+                  <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '4px', fontWeight: '500' }}>Product Weight</p>
+                  <p style={{ fontSize: '15px', color: '#111827' }}>{form.productInfo.productWeight}</p>
+                </div>
+                <div>
+                  <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '4px', fontWeight: '500' }}>Product Dimensions</p>
+                  <p style={{ fontSize: '15px', color: '#111827' }}>{form.productInfo.productDimensions}</p>
                 </div>
                 <div>
                   <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '4px', fontWeight: '500' }}>MRP</p>
                   <p style={{ fontSize: '15px', color: '#111827', fontWeight: '600' }}>₹{form.productInfo.mrp}</p>
+                </div>
+                <div>
+                  <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '4px', fontWeight: '500' }}>Shelf Life</p>
+                  <p style={{ fontSize: '15px', color: '#111827' }}>{form.productInfo.shelfLife || 'N/A'}</p>
+                </div>
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '4px', fontWeight: '500' }}>Storage Instructions</p>
+                  <p style={{ fontSize: '15px', color: '#111827' }}>{form.productInfo.storageInstructions || 'N/A'}</p>
+                </div>
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '8px', fontWeight: '500' }}>Ingredients</p>
+                  {form.productInfo.ingredients && (
+                    <p style={{ fontSize: '15px', color: '#111827', whiteSpace: 'pre-wrap', marginBottom: '12px' }}>{form.productInfo.ingredients}</p>
+                  )}
+                  {form.ingredientsPdf && (
+                    <a href={getImageUrl(form.ingredientsPdf.publicUrl)} target="_blank" rel="noopener noreferrer"
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 16px', background: '#fee2e2', color: '#991b1b', borderRadius: '8px', textDecoration: 'none', fontSize: '14px', fontWeight: '500', border: '1px solid #fecaca' }}>
+                      📄 View Ingredients PDF
+                    </a>
+                  )}
+                  {!form.productInfo.ingredients && !form.ingredientsPdf && (
+                    <p style={{ fontSize: '15px', color: '#6b7280' }}>N/A</p>
+                  )}
+                </div>
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '8px', fontWeight: '500' }}>Nutritional Facts</p>
+                  {form.productInfo.nutritionalFacts && (
+                    <p style={{ fontSize: '15px', color: '#111827', whiteSpace: 'pre-wrap', marginBottom: '12px' }}>{form.productInfo.nutritionalFacts}</p>
+                  )}
+                  {form.nutritionalFactsPdf && (
+                    <a href={getImageUrl(form.nutritionalFactsPdf.publicUrl)} target="_blank" rel="noopener noreferrer"
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 16px', background: '#dbeafe', color: '#1e40af', borderRadius: '8px', textDecoration: 'none', fontSize: '14px', fontWeight: '500', border: '1px solid #bfdbfe' }}>
+                      📄 View Nutritional Facts PDF
+                    </a>
+                  )}
+                  {!form.productInfo.nutritionalFacts && !form.nutritionalFactsPdf && (
+                    <p style={{ fontSize: '15px', color: '#6b7280' }}>N/A</p>
+                  )}
+                </div>
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '4px', fontWeight: '500' }}>Allergen Information</p>
+                  <p style={{ fontSize: '15px', color: '#111827', whiteSpace: 'pre-wrap' }}>{form.productInfo.allergenInformation || 'N/A'}</p>
+                </div>
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '4px', fontWeight: '500' }}>Directions for Use</p>
+                  <p style={{ fontSize: '15px', color: '#111827', whiteSpace: 'pre-wrap' }}>{form.productInfo.directionsForUse}</p>
+                </div>
+              </div>
+            </div>
+
+            {form.logo && (
+              <div style={{ marginBottom: '32px' }}>
+                <h3 style={{ color: '#111827', marginBottom: '20px', fontSize: '17px', fontWeight: '600' }}>Product Logo</h3>
+                <div style={{ display: 'inline-block', padding: '16px', background: '#f9fafb', borderRadius: '12px', border: '1px solid #e5e7eb' }}>
+                  <img src={getImageUrl(form.logo.publicUrl)} alt="Product Logo" style={{ maxWidth: '250px', maxHeight: '250px', objectFit: 'contain', borderRadius: '8px' }} />
+                </div>
+              </div>
+            )}
+
+            <div style={{ marginBottom: '32px' }}>
+              <h3 style={{ color: '#111827', marginBottom: '20px', fontSize: '17px', fontWeight: '600' }}>Target Customer</h3>
+              <div className="grid-2" style={{ gap: '20px 40px' }}>
+                <div>
+                  <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '4px', fontWeight: '500' }}>Gender</p>
+                  <p style={{ fontSize: '15px', color: '#111827', textTransform: 'capitalize' }}>{form.targetCustomer.targetGender}</p>
+                </div>
+                <div>
+                  <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '4px', fontWeight: '500' }}>Income Level</p>
+                  <p style={{ fontSize: '15px', color: '#111827', textTransform: 'capitalize' }}>{form.targetCustomer.targetIncome || 'N/A'}</p>
+                </div>
+                <div>
+                  <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '4px', fontWeight: '500' }}>Location Type</p>
+                  <p style={{ fontSize: '15px', color: '#111827', textTransform: 'capitalize' }}>{form.targetCustomer.targetLocation}</p>
+                </div>
+                <div>
+                  <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '4px', fontWeight: '500' }}>Buyer Channel</p>
+                  <p style={{ fontSize: '15px', color: '#111827', textTransform: 'capitalize' }}>{form.targetCustomer.buyerChannel}</p>
+                </div>
+                <div>
+                  <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '4px', fontWeight: '500' }}>Buyer Segment</p>
+                  <p style={{ fontSize: '15px', color: '#111827', textTransform: 'capitalize' }}>{form.targetCustomer.buyerSegment}</p>
+                </div>
+                <div>
+                  <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '4px', fontWeight: '500' }}>Business Model</p>
+                  <p style={{ fontSize: '15px', color: '#111827', textTransform: 'capitalize' }}>{form.targetCustomer.businessModel}</p>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ marginBottom: '32px' }}>
+              <h3 style={{ color: '#111827', marginBottom: '20px', fontSize: '17px', fontWeight: '600' }}>Package Specifications</h3>
+              <div className="grid-2" style={{ gap: '20px 40px' }}>
+                <div>
+                  <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '4px', fontWeight: '500' }}>Package Type</p>
+                  <p style={{ fontSize: '15px', color: '#111827', textTransform: 'capitalize' }}>{form.packageSpec.packageType}</p>
+                </div>
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '4px', fontWeight: '500' }}>Additional Notes</p>
+                  <p style={{ fontSize: '15px', color: '#111827', whiteSpace: 'pre-wrap' }}>{form.packageSpec.packageNotes || 'N/A'}</p>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ marginBottom: '32px' }}>
+              <h3 style={{ color: '#111827', marginBottom: '20px', fontSize: '17px', fontWeight: '600' }}>Design Direction</h3>
+              <div className="grid-2" style={{ gap: '20px 40px' }}>
+                <div>
+                  <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '4px', fontWeight: '500' }}>Primary Color</p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div style={{ width: '40px', height: '40px', borderRadius: '8px', background: form.designDirection.primaryColor || '#e5e7eb', border: '1px solid #d1d5db' }}></div>
+                    <p style={{ fontSize: '15px', color: '#111827', fontWeight: '500' }}>{form.designDirection.primaryColor || 'N/A'}</p>
+                  </div>
+                </div>
+                <div>
+                  <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '4px', fontWeight: '500' }}>Secondary Color</p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div style={{ width: '40px', height: '40px', borderRadius: '8px', background: form.designDirection.secondaryColor || '#e5e7eb', border: '1px solid #d1d5db' }}></div>
+                    <p style={{ fontSize: '15px', color: '#111827', fontWeight: '500' }}>{form.designDirection.secondaryColor || 'N/A'}</p>
+                  </div>
+                </div>
+                <div>
+                  <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '4px', fontWeight: '500' }}>Accent Color</p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div style={{ width: '40px', height: '40px', borderRadius: '8px', background: form.designDirection.accentColor || '#e5e7eb', border: '1px solid #d1d5db' }}></div>
+                    <p style={{ fontSize: '15px', color: '#111827', fontWeight: '500' }}>{form.designDirection.accentColor || 'N/A'}</p>
+                  </div>
+                </div>
+                <div>
+                  <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '4px', fontWeight: '500' }}>Colors to Avoid</p>
+                  <p style={{ fontSize: '15px', color: '#111827' }}>{form.designDirection.colorsToAvoid || 'N/A'}</p>
+                </div>
+                <div>
+                  <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '4px', fontWeight: '500' }}>Design Density</p>
+                  <p style={{ fontSize: '15px', color: '#111827', textTransform: 'capitalize' }}>{form.designDirection.designDensity || 'N/A'}</p>
+                </div>
+                <div>
+                  <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '4px', fontWeight: '500' }}>Brand Perception</p>
+                  <p style={{ fontSize: '15px', color: '#111827', textTransform: 'capitalize' }}>{form.designDirection.brandPerception || 'N/A'}</p>
+                </div>
+                <div>
+                  <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '4px', fontWeight: '500' }}>Design Aesthetic</p>
+                  <p style={{ fontSize: '15px', color: '#111827', textTransform: 'capitalize' }}>{form.designDirection.designAesthetic || 'N/A'}</p>
+                </div>
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '4px', fontWeight: '500' }}>Design Inspiration</p>
+                  <p style={{ fontSize: '15px', color: '#111827', whiteSpace: 'pre-wrap' }}>{form.designDirection.designInspiration || 'N/A'}</p>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ marginBottom: '32px' }}>
+              <h3 style={{ color: '#111827', marginBottom: '20px', fontSize: '17px', fontWeight: '600' }}>Timeline</h3>
+              <div className="grid-2" style={{ gap: '20px 40px' }}>
+                <div>
+                  <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '4px', fontWeight: '500' }}>Launch Date</p>
+                  <p style={{ fontSize: '15px', color: '#111827', fontWeight: '500' }}>
+                    {form.timeline.launchDate ? new Date(form.timeline.launchDate).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'N/A'}
+                  </p>
+                </div>
+                <div>
+                  <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '4px', fontWeight: '500' }}>Printing Date</p>
+                  <p style={{ fontSize: '15px', color: '#111827', fontWeight: '500' }}>
+                    {form.timeline.printingDate ? new Date(form.timeline.printingDate).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'N/A'}
+                  </p>
+                </div>
+                <div>
+                  <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '4px', fontWeight: '500' }}>Expected Delivery</p>
+                  <p style={{ fontSize: '15px', color: '#111827', fontWeight: '500' }}>
+                    {form.timeline.expectedDelivery ? new Date(form.timeline.expectedDelivery).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'N/A'}
+                  </p>
+                </div>
+                <div>
+                  <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '4px', fontWeight: '500' }}>Priority</p>
+                  <p style={{ fontSize: '15px', color: '#111827', textTransform: 'capitalize', fontWeight: '500' }}>
+                    <span style={{ padding: '4px 12px', borderRadius: '6px', background: form.timeline.urgent === 'yes' ? '#fee2e2' : '#f3f4f6', color: form.timeline.urgent === 'yes' ? '#991b1b' : '#374151' }}>
+                      {form.timeline.urgent === 'yes' ? 'Urgent' : form.timeline.urgent === 'no' ? 'Standard' : 'Flexible'}
+                    </span>
+                  </p>
+                </div>
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '4px', fontWeight: '500' }}>Timeline Notes</p>
+                  <p style={{ fontSize: '15px', color: '#111827', whiteSpace: 'pre-wrap' }}>{form.timeline.timelineNotes || 'N/A'}</p>
                 </div>
               </div>
             </div>

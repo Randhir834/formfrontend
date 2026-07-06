@@ -6,6 +6,9 @@ function FormSubmission() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [referenceImages, setReferenceImages] = useState([]);
+  const [logo, setLogo] = useState(null);
+  const [nutritionalFactsPdf, setNutritionalFactsPdf] = useState(null);
+  const [ingredientsPdf, setIngredientsPdf] = useState(null);
   const [approvalConfirmed, setApprovalConfirmed] = useState(false);
   
   const [formData, setFormData] = useState({
@@ -45,26 +48,36 @@ function FormSubmission() {
     }));
   };
 
-  const handleCheckboxChange = (section, field, value, checked) => {
-    setFormData(prev => {
-      const currentArray = prev[section][field] || [];
-      const newArray = checked
-        ? [...currentArray, value]
-        : currentArray.filter(item => item !== value);
-      
-      return {
-        ...prev,
-        [section]: {
-          ...prev[section],
-          [field]: newArray
-        }
-      };
-    });
-  };
-
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files).slice(0, 3);
     setReferenceImages(files);
+  };
+
+  const handleLogoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setLogo(file);
+    }
+  };
+
+  const handleNutritionalFactsPdfChange = (e) => {
+    const file = e.target.files[0];
+    if (file && file.type === 'application/pdf') {
+      setNutritionalFactsPdf(file);
+    } else if (file) {
+      alert('Please upload a PDF file for nutritional facts');
+      e.target.value = '';
+    }
+  };
+
+  const handleIngredientsPdfChange = (e) => {
+    const file = e.target.files[0];
+    if (file && file.type === 'application/pdf') {
+      setIngredientsPdf(file);
+    } else if (file) {
+      alert('Please upload a PDF file for ingredients');
+      e.target.value = '';
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -86,9 +99,25 @@ function FormSubmission() {
       const data = new FormData();
       data.append('formData', JSON.stringify({...formData, approvalConfirmed}));
       
+      // Add reference images
       referenceImages.forEach((file) => {
         data.append('referenceImages', file);
       });
+
+      // Add logo if provided
+      if (logo) {
+        data.append('logo', logo);
+      }
+
+      // Add nutritional facts PDF if provided
+      if (nutritionalFactsPdf) {
+        data.append('nutritionalFactsPdf', nutritionalFactsPdf);
+      }
+
+      // Add ingredients PDF if provided
+      if (ingredientsPdf) {
+        data.append('ingredientsPdf', ingredientsPdf);
+      }
 
       await submitForm(data);
       alert('Form submitted successfully!');
@@ -203,10 +232,10 @@ function FormSubmission() {
                     placeholder="Enter product name" />
                 </div>
                 <div className="form-group">
-                  <label>Product Category *</label>
+                  <label>Product Name (Category) *</label>
                   <select required value={formData.productInfo.productCategory}
                     onChange={(e) => handleInputChange('productInfo', 'productCategory', e.target.value)}>
-                    <option value="">Select Category</option>
+                    <option value="">Select Product Name</option>
                     <option value="beverages">Beverages</option>
                     <option value="snacks">Snacks</option>
                     <option value="dairy">Dairy</option>
@@ -254,16 +283,50 @@ function FormSubmission() {
                     placeholder="e.g., Store in a cool, dry place away from direct sunlight" rows="2" />
                 </div>
                 <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-                  <label>Ingredients *</label>
-                  <textarea required value={formData.productInfo.ingredients}
-                    onChange={(e) => handleInputChange('productInfo', 'ingredients', e.target.value)}
-                    placeholder="List all ingredients in order of quantity" rows="3" />
+                  <label>Ingredients</label>
+                  <div style={{ marginBottom: '12px' }}>
+                    <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '8px' }}>
+                      Enter ingredients as text or upload a PDF (or both)
+                    </p>
+                    <textarea value={formData.productInfo.ingredients}
+                      onChange={(e) => handleInputChange('productInfo', 'ingredients', e.target.value)}
+                      placeholder="List all ingredients in order of quantity (optional if PDF is uploaded)" rows="3" />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '8px', display: 'block' }}>
+                      Or Upload Ingredients PDF
+                    </label>
+                    <input type="file" accept="application/pdf" onChange={handleIngredientsPdfChange}
+                      style={{ marginTop: '6px', padding: '10px', fontSize: '14px' }} />
+                    {ingredientsPdf && (
+                      <p style={{ fontSize: '13px', color: '#10b981', marginTop: '8px', fontWeight: '500' }}>
+                        ✓ {ingredientsPdf.name}
+                      </p>
+                    )}
+                  </div>
                 </div>
                 <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-                  <label>Nutritional Facts *</label>
-                  <textarea required value={formData.productInfo.nutritionalFacts}
-                    onChange={(e) => handleInputChange('productInfo', 'nutritionalFacts', e.target.value)}
-                    placeholder="Per serving: Energy, Protein, Carbs, Fat, Fiber, etc." rows="4" />
+                  <label>Nutritional Facts</label>
+                  <div style={{ marginBottom: '12px' }}>
+                    <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '8px' }}>
+                      Enter nutritional facts as text or upload a PDF (or both)
+                    </p>
+                    <textarea value={formData.productInfo.nutritionalFacts}
+                      onChange={(e) => handleInputChange('productInfo', 'nutritionalFacts', e.target.value)}
+                      placeholder="Per serving: Energy, Protein, Carbs, Fat, Fiber, etc. (optional if PDF is uploaded)" rows="4" />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '8px', display: 'block' }}>
+                      Or Upload Nutritional Facts PDF
+                    </label>
+                    <input type="file" accept="application/pdf" onChange={handleNutritionalFactsPdfChange}
+                      style={{ marginTop: '6px', padding: '10px', fontSize: '14px' }} />
+                    {nutritionalFactsPdf && (
+                      <p style={{ fontSize: '13px', color: '#10b981', marginTop: '8px', fontWeight: '500' }}>
+                        ✓ {nutritionalFactsPdf.name}
+                      </p>
+                    )}
+                  </div>
                 </div>
                 <div className="form-group" style={{ gridColumn: '1 / -1' }}>
                   <label>Allergen Information</label>
@@ -505,10 +568,35 @@ function FormSubmission() {
               </div>
             </div>
 
+            {/* Logo Upload */}
+            <div style={{ marginBottom: '48px' }}>
+              <h2 style={{ color: '#111827', marginBottom: '24px', paddingBottom: '12px', borderBottom: '2px solid #f3f4f6', fontSize: '20px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', background: '#10b981', color: 'white', borderRadius: '50%', fontSize: '15px', fontWeight: '600' }}>7</span>
+                Logo Upload (Optional)
+              </h2>
+              <div className="form-group">
+                <label>Upload Product Logo</label>
+                <input type="file" accept="image/*" onChange={handleLogoChange}
+                  style={{ marginTop: '10px', padding: '12px' }} />
+                <p style={{ fontSize: '13px', color: '#6b7280', marginTop: '8px' }}>
+                  Upload your product logo (optional)
+                </p>
+                {logo && (
+                  <div style={{ marginTop: '20px' }}>
+                    <img src={URL.createObjectURL(logo)} alt="Logo preview"
+                      style={{ maxWidth: '200px', maxHeight: '200px', border: '2px solid #e5e7eb', borderRadius: '12px', objectFit: 'contain', padding: '10px', background: 'white' }} />
+                    <p style={{ fontSize: '13px', color: '#10b981', marginTop: '8px', fontWeight: '500' }}>
+                      ✓ {logo.name}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+
             {/* Reference Images */}
             <div style={{ marginBottom: '48px' }}>
               <h2 style={{ color: '#111827', marginBottom: '24px', paddingBottom: '12px', borderBottom: '2px solid #f3f4f6', fontSize: '20px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', background: '#6b7280', color: 'white', borderRadius: '50%', fontSize: '15px', fontWeight: '600' }}>7</span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', background: '#6b7280', color: 'white', borderRadius: '50%', fontSize: '15px', fontWeight: '600' }}>8</span>
                 Reference Images (Required - 3 images)
               </h2>
               <div className="form-group">
@@ -534,7 +622,7 @@ function FormSubmission() {
               </div>
             </div>
 
-            {/* Section 7: Approval Confirmation */}
+            {/* Section 9: Approval Confirmation */}
             <div style={{ marginBottom: '32px', padding: '24px', backgroundColor: '#eff6ff', borderRadius: '12px', border: '2px solid #2563eb' }}>
               <h2 style={{ color: '#111827', marginBottom: '16px', fontSize: '18px', fontWeight: '600' }}>
                 Approval & Confirmation
