@@ -282,6 +282,33 @@ function FormSubmission() {
                     onChange={(e) => handleInputChange('productInfo', 'storageInstructions', e.target.value)}
                     placeholder="e.g., Store in a cool, dry place away from direct sunlight" rows="2" />
                 </div>
+                
+                {/* Product Logo Upload */}
+                <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+                  <label>Product Logo</label>
+                  <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '12px' }}>
+                    Upload your product or company logo (JPG, JPEG, PNG, SVG, WebP)
+                  </p>
+                  <input type="file" accept="image/jpeg,image/jpg,image/png,image/svg+xml,image/webp" onChange={handleLogoChange}
+                    style={{ marginTop: '6px', padding: '10px', fontSize: '14px' }} />
+                  {logo && (
+                    <div style={{ marginTop: '16px', padding: '16px', background: '#f0fdf4', borderRadius: '12px', border: '1px solid #86efac' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                        <img src={URL.createObjectURL(logo)} alt="Logo preview"
+                          style={{ maxWidth: '120px', maxHeight: '120px', border: '2px solid #e5e7eb', borderRadius: '8px', objectFit: 'contain', padding: '8px', background: 'white' }} />
+                        <div>
+                          <p style={{ fontSize: '14px', color: '#166534', fontWeight: '600', marginBottom: '4px' }}>
+                            ✓ Logo Selected
+                          </p>
+                          <p style={{ fontSize: '13px', color: '#15803d' }}>
+                            {logo.name}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                
                 <div className="form-group" style={{ gridColumn: '1 / -1' }}>
                   <label>Ingredients</label>
                   <div style={{ marginBottom: '12px' }}>
@@ -568,30 +595,7 @@ function FormSubmission() {
               </div>
             </div>
 
-            {/* Logo Upload */}
-            <div style={{ marginBottom: '48px' }}>
-              <h2 style={{ color: '#111827', marginBottom: '24px', paddingBottom: '12px', borderBottom: '2px solid #f3f4f6', fontSize: '20px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', background: '#10b981', color: 'white', borderRadius: '50%', fontSize: '15px', fontWeight: '600' }}>7</span>
-                Logo Upload (Optional)
-              </h2>
-              <div className="form-group">
-                <label>Upload Product Logo</label>
-                <input type="file" accept="image/*" onChange={handleLogoChange}
-                  style={{ marginTop: '10px', padding: '12px' }} />
-                <p style={{ fontSize: '13px', color: '#6b7280', marginTop: '8px' }}>
-                  Upload your product logo (optional)
-                </p>
-                {logo && (
-                  <div style={{ marginTop: '20px' }}>
-                    <img src={URL.createObjectURL(logo)} alt="Logo preview"
-                      style={{ maxWidth: '200px', maxHeight: '200px', border: '2px solid #e5e7eb', borderRadius: '12px', objectFit: 'contain', padding: '10px', background: 'white' }} />
-                    <p style={{ fontSize: '13px', color: '#10b981', marginTop: '8px', fontWeight: '500' }}>
-                      ✓ {logo.name}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
+            {/* Logo Upload - Moved to Product Information section */}
 
             {/* Reference Images */}
             <div style={{ marginBottom: '48px' }}>

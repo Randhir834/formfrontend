@@ -174,14 +174,75 @@ function FormDetail() {
               </div>
               <div>
                 <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '4px', fontWeight: '500' }}>Variant</p>
-                <p style={{ fontSize: '15px', color: '#111827' }}>{form.productInfo.productVariant}</p>
+                <p style={{ fontSize: '15px', color: '#111827' }}>{form.productInfo.productVariant || 'N/A'}</p>
+              </div>
+              <div>
+                <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '4px', fontWeight: '500' }}>Weight</p>
+                <p style={{ fontSize: '15px', color: '#111827' }}>{form.productInfo.productWeight}</p>
+              </div>
+              <div>
+                <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '4px', fontWeight: '500' }}>Dimensions</p>
+                <p style={{ fontSize: '15px', color: '#111827' }}>{form.productInfo.productDimensions}</p>
               </div>
               <div>
                 <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '4px', fontWeight: '500' }}>MRP</p>
                 <p style={{ fontSize: '15px', color: '#111827', fontWeight: '600' }}>₹{form.productInfo.mrp}</p>
               </div>
+              <div>
+                <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '4px', fontWeight: '500' }}>Shelf Life</p>
+                <p style={{ fontSize: '15px', color: '#111827' }}>{form.productInfo.shelfLife || 'N/A'}</p>
+              </div>
+              <div style={{ gridColumn: '1 / -1' }}>
+                <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '4px', fontWeight: '500' }}>Storage Instructions</p>
+                <p style={{ fontSize: '15px', color: '#111827' }}>{form.productInfo.storageInstructions || 'N/A'}</p>
+              </div>
+              <div style={{ gridColumn: '1 / -1' }}>
+                <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '8px', fontWeight: '500' }}>Ingredients</p>
+                {form.productInfo.ingredients ? (
+                  <p style={{ fontSize: '15px', color: '#111827', whiteSpace: 'pre-wrap', marginBottom: '12px' }}>{form.productInfo.ingredients}</p>
+                ) : (
+                  <p style={{ fontSize: '15px', color: '#6b7280', marginBottom: '12px' }}>N/A</p>
+                )}
+                {form.ingredientsPdf && (
+                  <a href={getImageUrl(form.ingredientsPdf.publicUrl)} target="_blank" rel="noopener noreferrer"
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 16px', background: '#fee2e2', color: '#991b1b', borderRadius: '8px', textDecoration: 'none', fontSize: '14px', fontWeight: '500', border: '1px solid #fecaca' }}>
+                    📄 View Ingredients PDF
+                  </a>
+                )}
+              </div>
+              <div style={{ gridColumn: '1 / -1' }}>
+                <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '8px', fontWeight: '500' }}>Nutritional Facts</p>
+                {form.productInfo.nutritionalFacts ? (
+                  <p style={{ fontSize: '15px', color: '#111827', whiteSpace: 'pre-wrap', marginBottom: '12px' }}>{form.productInfo.nutritionalFacts}</p>
+                ) : (
+                  <p style={{ fontSize: '15px', color: '#6b7280', marginBottom: '12px' }}>N/A</p>
+                )}
+                {form.nutritionalFactsPdf && (
+                  <a href={getImageUrl(form.nutritionalFactsPdf.publicUrl)} target="_blank" rel="noopener noreferrer"
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 16px', background: '#dbeafe', color: '#1e40af', borderRadius: '8px', textDecoration: 'none', fontSize: '14px', fontWeight: '500', border: '1px solid #bfdbfe' }}>
+                    📄 View Nutritional Facts PDF
+                  </a>
+                )}
+              </div>
+              <div style={{ gridColumn: '1 / -1' }}>
+                <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '4px', fontWeight: '500' }}>Allergen Information</p>
+                <p style={{ fontSize: '15px', color: '#111827' }}>{form.productInfo.allergenInformation || 'N/A'}</p>
+              </div>
+              <div style={{ gridColumn: '1 / -1' }}>
+                <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '4px', fontWeight: '500' }}>Directions for Use</p>
+                <p style={{ fontSize: '15px', color: '#111827', whiteSpace: 'pre-wrap' }}>{form.productInfo.directionsForUse}</p>
+              </div>
             </div>
           </div>
+
+          {form.logo && (
+            <div style={{ marginBottom: '40px' }}>
+              <h3 style={{ color: '#111827', marginBottom: '20px', fontSize: '17px', fontWeight: '600' }}>Product Logo</h3>
+              <div style={{ display: 'inline-block', padding: '16px', background: '#f9fafb', borderRadius: '12px', border: '1px solid #e5e7eb' }}>
+                <img src={getImageUrl(form.logo.publicUrl)} alt="Product Logo" style={{ maxWidth: '250px', maxHeight: '250px', objectFit: 'contain', borderRadius: '8px' }} />
+              </div>
+            </div>
+          )}
 
           {form.referenceImages && form.referenceImages.length > 0 && (
             <div style={{ marginBottom: '40px' }}>

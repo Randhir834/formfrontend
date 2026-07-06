@@ -11,6 +11,18 @@ function FormEdit() {
   const [newImages, setNewImages] = useState([]);
   const [deletedImages, setDeletedImages] = useState([]);
   
+  const [existingLogo, setExistingLogo] = useState(null);
+  const [newLogo, setNewLogo] = useState(null);
+  const [deleteLogo, setDeleteLogo] = useState(false);
+  
+  const [existingNutritionalPdf, setExistingNutritionalPdf] = useState(null);
+  const [newNutritionalPdf, setNewNutritionalPdf] = useState(null);
+  const [deleteNutritionalPdf, setDeleteNutritionalPdf] = useState(false);
+  
+  const [existingIngredientsPdf, setExistingIngredientsPdf] = useState(null);
+  const [newIngredientsPdf, setNewIngredientsPdf] = useState(null);
+  const [deleteIngredientsPdf, setDeleteIngredientsPdf] = useState(false);
+  
   const [approvalConfirmed, setApprovalConfirmed] = useState(false);
   
   const [formData, setFormData] = useState({
@@ -98,6 +110,51 @@ function FormEdit() {
     return existingImages.length - deletedImages.length + newImages.length;
   };
 
+  const handleLogoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setNewLogo(file);
+      setDeleteLogo(false);
+    }
+  };
+
+  const handleDeleteLogo = () => {
+    setDeleteLogo(true);
+    setNewLogo(null);
+  };
+
+  const handleNutritionalPdfChange = (e) => {
+    const file = e.target.files[0];
+    if (file && file.type === 'application/pdf') {
+      setNewNutritionalPdf(file);
+      setDeleteNutritionalPdf(false);
+    } else if (file) {
+      alert('Please upload a PDF file for nutritional facts');
+      e.target.value = '';
+    }
+  };
+
+  const handleDeleteNutritionalPdf = () => {
+    setDeleteNutritionalPdf(true);
+    setNewNutritionalPdf(null);
+  };
+
+  const handleIngredientsPdfChange = (e) => {
+    const file = e.target.files[0];
+    if (file && file.type === 'application/pdf') {
+      setNewIngredientsPdf(file);
+      setDeleteIngredientsPdf(false);
+    } else if (file) {
+      alert('Please upload a PDF file for ingredients');
+      e.target.value = '';
+    }
+  };
+
+  const handleDeleteIngredientsPdf = () => {
+    setDeleteIngredientsPdf(true);
+    setNewIngredientsPdf(null);
+  };
+
   useEffect(() => {
     fetchFormData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -118,6 +175,9 @@ function FormEdit() {
       });
       
       setExistingImages(form.referenceImages || []);
+      setExistingLogo(form.logo || null);
+      setExistingNutritionalPdf(form.nutritionalFactsPdf || null);
+      setExistingIngredientsPdf(form.ingredientsPdf || null);
       setApprovalConfirmed(form.approvalConfirmed || false);
     } catch (error) {
       alert('Error fetching form');
@@ -152,6 +212,36 @@ function FormEdit() {
       newImages.forEach((file) => {
         data.append('referenceImages', file);
       });
+
+      // Add logo if new one is provided
+      if (newLogo) {
+        data.append('logo', newLogo);
+      }
+      
+      // Mark logo for deletion
+      if (deleteLogo) {
+        data.append('deleteLogo', 'true');
+      }
+
+      // Add nutritional facts PDF if new one is provided
+      if (newNutritionalPdf) {
+        data.append('nutritionalFactsPdf', newNutritionalPdf);
+      }
+      
+      // Mark nutritional PDF for deletion
+      if (deleteNutritionalPdf) {
+        data.append('deleteNutritionalPdf', 'true');
+      }
+
+      // Add ingredients PDF if new one is provided
+      if (newIngredientsPdf) {
+        data.append('ingredientsPdf', newIngredientsPdf);
+      }
+      
+      // Mark ingredients PDF for deletion
+      if (deleteIngredientsPdf) {
+        data.append('deleteIngredientsPdf', 'true');
+      }
 
       await updateForm(id, data);
       alert('Form updated successfully!');
@@ -320,18 +410,123 @@ function FormEdit() {
                     onChange={(e) => handleInputChange('productInfo', 'storageInstructions', e.target.value)}
                     placeholder="e.g., Store in a cool, dry place away from direct sunlight" rows="2" />
                 </div>
+                
+                {/* Product Logo */}
                 <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-                  <label>Ingredients *</label>
-                  <textarea required value={formData.productInfo.ingredients}
-                    onChange={(e) => handleInputChange('productInfo', 'ingredients', e.target.value)}
-                    placeholder="List all ingredients in order of quantity" rows="3" />
+                  <label>Product Logo</label>
+                  <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '12px' }}>
+                    Upload your product or company logo (JPG, JPEG, PNG, SVG, WebP)
+                  </p>
+                  {existingLogo && !deleteLogo && (
+                    <div style={{ marginBottom: '12px', padding: '16px', background: '#f9fafb', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <img src={getImageUrl(existingLogo.publicUrl)} alt="Current Logo" style={{ maxWidth: '100px', maxHeight: '100px', objectFit: 'contain', borderRadius: '6px' }} />
+                        <div style={{ flex: 1 }}>
+                          <p style={{ fontSize: '14px', fontWeight: '500', color: '#111827', marginBottom: '4px' }}>Current Logo</p>
+                          <p style={{ fontSize: '13px', color: '#6b7280' }}>{existingLogo.filename}</p>
+                        </div>
+                        <button type="button" onClick={handleDeleteLogo} style={{ padding: '8px 16px', background: '#fee2e2', color: '#991b1b', border: '1px solid #fecaca', borderRadius: '6px', fontSize: '14px', fontWeight: '500', cursor: 'pointer' }}>
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                  {newLogo && (
+                    <div style={{ marginBottom: '12px', padding: '12px', background: '#d1fae5', borderRadius: '8px', border: '1px solid #6ee7b7' }}>
+                      <p style={{ fontSize: '14px', color: '#065f46', fontWeight: '500' }}>✓ New logo selected: {newLogo.name}</p>
+                    </div>
+                  )}
+                  {deleteLogo && (
+                    <div style={{ marginBottom: '12px', padding: '12px', background: '#fee2e2', borderRadius: '8px', border: '1px solid #fecaca' }}>
+                      <p style={{ fontSize: '14px', color: '#991b1b', fontWeight: '500' }}>Logo will be removed upon saving</p>
+                    </div>
+                  )}
+                  <input type="file" accept="image/jpeg,image/jpg,image/png,image/svg+xml,image/webp" onChange={handleLogoChange}
+                    style={{ marginTop: '6px', padding: '10px', fontSize: '14px' }} />
                 </div>
+                
+                {/* Ingredients */}
                 <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-                  <label>Nutritional Facts *</label>
-                  <textarea required value={formData.productInfo.nutritionalFacts}
-                    onChange={(e) => handleInputChange('productInfo', 'nutritionalFacts', e.target.value)}
-                    placeholder="Per serving: Energy, Protein, Carbs, Fat, Fiber, etc." rows="4" />
+                  <label>Ingredients</label>
+                  <div style={{ marginBottom: '12px' }}>
+                    <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '8px' }}>
+                      Enter ingredients as text or upload a PDF (or both)
+                    </p>
+                    <textarea value={formData.productInfo.ingredients}
+                      onChange={(e) => handleInputChange('productInfo', 'ingredients', e.target.value)}
+                      placeholder="List all ingredients in order of quantity (optional if PDF is uploaded)" rows="3" />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '8px', display: 'block' }}>
+                      Or Upload Ingredients PDF
+                    </label>
+                    {existingIngredientsPdf && !deleteIngredientsPdf && (
+                      <div style={{ marginBottom: '12px', padding: '12px', background: '#f9fafb', borderRadius: '8px', border: '1px solid #e5e7eb', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <span style={{ fontSize: '24px' }}>📄</span>
+                        <div style={{ flex: 1 }}>
+                          <p style={{ fontSize: '14px', fontWeight: '500', color: '#111827' }}>Current PDF: {existingIngredientsPdf.filename}</p>
+                        </div>
+                        <button type="button" onClick={handleDeleteIngredientsPdf} style={{ padding: '6px 12px', background: '#fee2e2', color: '#991b1b', border: '1px solid #fecaca', borderRadius: '6px', fontSize: '13px', fontWeight: '500', cursor: 'pointer' }}>
+                          Remove
+                        </button>
+                      </div>
+                    )}
+                    {newIngredientsPdf && (
+                      <p style={{ fontSize: '13px', color: '#10b981', marginBottom: '8px', fontWeight: '500' }}>
+                        ✓ New PDF selected: {newIngredientsPdf.name}
+                      </p>
+                    )}
+                    {deleteIngredientsPdf && (
+                      <p style={{ fontSize: '13px', color: '#ef4444', marginBottom: '8px', fontWeight: '500' }}>
+                        PDF will be removed upon saving
+                      </p>
+                    )}
+                    <input type="file" accept="application/pdf" onChange={handleIngredientsPdfChange}
+                      style={{ marginTop: '6px', padding: '10px', fontSize: '14px' }} />
+                  </div>
                 </div>
+                
+                {/* Nutritional Facts */}
+                <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+                  <label>Nutritional Facts</label>
+                  <div style={{ marginBottom: '12px' }}>
+                    <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '8px' }}>
+                      Enter nutritional facts as text or upload a PDF (or both)
+                    </p>
+                    <textarea value={formData.productInfo.nutritionalFacts}
+                      onChange={(e) => handleInputChange('productInfo', 'nutritionalFacts', e.target.value)}
+                      placeholder="Per serving: Energy, Protein, Carbs, Fat, Fiber, etc. (optional if PDF is uploaded)" rows="4" />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '8px', display: 'block' }}>
+                      Or Upload Nutritional Facts PDF
+                    </label>
+                    {existingNutritionalPdf && !deleteNutritionalPdf && (
+                      <div style={{ marginBottom: '12px', padding: '12px', background: '#f9fafb', borderRadius: '8px', border: '1px solid #e5e7eb', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <span style={{ fontSize: '24px' }}>📄</span>
+                        <div style={{ flex: 1 }}>
+                          <p style={{ fontSize: '14px', fontWeight: '500', color: '#111827' }}>Current PDF: {existingNutritionalPdf.filename}</p>
+                        </div>
+                        <button type="button" onClick={handleDeleteNutritionalPdf} style={{ padding: '6px 12px', background: '#fee2e2', color: '#991b1b', border: '1px solid #fecaca', borderRadius: '6px', fontSize: '13px', fontWeight: '500', cursor: 'pointer' }}>
+                          Remove
+                        </button>
+                      </div>
+                    )}
+                    {newNutritionalPdf && (
+                      <p style={{ fontSize: '13px', color: '#10b981', marginBottom: '8px', fontWeight: '500' }}>
+                        ✓ New PDF selected: {newNutritionalPdf.name}
+                      </p>
+                    )}
+                    {deleteNutritionalPdf && (
+                      <p style={{ fontSize: '13px', color: '#ef4444', marginBottom: '8px', fontWeight: '500' }}>
+                        PDF will be removed upon saving
+                      </p>
+                    )}
+                    <input type="file" accept="application/pdf" onChange={handleNutritionalPdfChange}
+                      style={{ marginTop: '6px', padding: '10px', fontSize: '14px' }} />
+                  </div>
+                </div>
+                
                 <div className="form-group" style={{ gridColumn: '1 / -1' }}>
                   <label>Allergen Information</label>
                   <textarea value={formData.productInfo.allergenInformation}
