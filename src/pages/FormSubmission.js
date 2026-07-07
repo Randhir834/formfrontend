@@ -310,18 +310,18 @@ function FormSubmission() {
                 </div>
                 
                 <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-                  <label>Ingredients</label>
+                  <label>Ingredients <span style={{ fontSize: '13px', color: '#6b7280', fontWeight: '400' }}>(Optional)</span></label>
                   <div style={{ marginBottom: '12px' }}>
                     <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '8px' }}>
-                      Enter ingredients as text or upload a PDF (or both)
+                      Enter ingredients as text or upload a PDF (or both) - This field is optional
                     </p>
                     <textarea value={formData.productInfo.ingredients}
                       onChange={(e) => handleInputChange('productInfo', 'ingredients', e.target.value)}
-                      placeholder="List all ingredients in order of quantity (optional if PDF is uploaded)" rows="3" />
+                      placeholder="List all ingredients in order of quantity (optional)" rows="3" />
                   </div>
                   <div>
                     <label style={{ fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '8px', display: 'block' }}>
-                      Or Upload Ingredients PDF
+                      Or Upload Ingredients PDF <span style={{ fontSize: '13px', color: '#6b7280', fontWeight: '400' }}>(Optional)</span>
                     </label>
                     <input type="file" accept="application/pdf" onChange={handleIngredientsPdfChange}
                       style={{ marginTop: '6px', padding: '10px', fontSize: '14px' }} />
@@ -333,18 +333,18 @@ function FormSubmission() {
                   </div>
                 </div>
                 <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-                  <label>Nutritional Facts</label>
+                  <label>Nutritional Facts <span style={{ fontSize: '13px', color: '#6b7280', fontWeight: '400' }}>(Optional)</span></label>
                   <div style={{ marginBottom: '12px' }}>
                     <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '8px' }}>
-                      Enter nutritional facts as text or upload a PDF (or both)
+                      Enter nutritional facts as text or upload a PDF (or both) - This field is optional
                     </p>
                     <textarea value={formData.productInfo.nutritionalFacts}
                       onChange={(e) => handleInputChange('productInfo', 'nutritionalFacts', e.target.value)}
-                      placeholder="Per serving: Energy, Protein, Carbs, Fat, Fiber, etc. (optional if PDF is uploaded)" rows="4" />
+                      placeholder="Per serving: Energy, Protein, Carbs, Fat, Fiber, etc. (optional)" rows="4" />
                   </div>
                   <div>
                     <label style={{ fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '8px', display: 'block' }}>
-                      Or Upload Nutritional Facts PDF
+                      Or Upload Nutritional Facts PDF <span style={{ fontSize: '13px', color: '#6b7280', fontWeight: '400' }}>(Optional)</span>
                     </label>
                     <input type="file" accept="application/pdf" onChange={handleNutritionalFactsPdfChange}
                       style={{ marginTop: '6px', padding: '10px', fontSize: '14px' }} />

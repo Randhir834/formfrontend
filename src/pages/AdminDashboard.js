@@ -172,20 +172,50 @@ function AdminDashboard({ user, setUser }) {
                 <table>
                   <thead>
                     <tr>
-                      <th>Company</th>
+                      <th>Company / Brand</th>
                       <th>Product</th>
+                      <th>Contact Person</th>
+                      <th>Mobile / Email</th>
                       <th>Submitted By</th>
                       <th>Assigned To</th>
                       <th>Status</th>
-                      <th>Date</th>
+                      <th>Launch Date</th>
+                      <th>Priority</th>
+                      <th>Date Submitted</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {forms.map(form => (
                       <tr key={form._id}>
-                        <td style={{ fontWeight: '500' }}>{form.clientInfo?.companyName || 'N/A'}</td>
-                        <td>{form.productInfo?.productName || 'N/A'}</td>
+                        <td style={{ fontWeight: '500' }}>
+                          <div>{form.clientInfo?.companyName || 'N/A'}</div>
+                          {form.clientInfo?.brandName && (
+                            <div style={{ fontSize: '13px', color: '#6b7280', marginTop: '2px' }}>
+                              {form.clientInfo.brandName}
+                            </div>
+                          )}
+                        </td>
+                        <td>
+                          <div style={{ fontWeight: '500' }}>{form.productInfo?.productName || 'N/A'}</div>
+                          {form.productInfo?.productCategory && (
+                            <div style={{ fontSize: '13px', color: '#6b7280', marginTop: '2px' }}>
+                              {form.productInfo.productCategory}
+                            </div>
+                          )}
+                          {form.productInfo?.mrp && (
+                            <div style={{ fontSize: '13px', color: '#059669', marginTop: '2px', fontWeight: '500' }}>
+                              ₹{form.productInfo.mrp}
+                            </div>
+                          )}
+                        </td>
+                        <td style={{ color: '#111827' }}>{form.clientInfo?.contactPerson || 'N/A'}</td>
+                        <td style={{ fontSize: '14px' }}>
+                          <div>{form.clientInfo?.mobileNumber || 'N/A'}</div>
+                          <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '2px' }}>
+                            {form.clientInfo?.email || ''}
+                          </div>
+                        </td>
                         <td style={{ color: '#6b7280' }}>{form.userId?.name || 'N/A'}</td>
                         <td>
                           {form.assignedTo ? (
@@ -201,14 +231,56 @@ function AdminDashboard({ user, setUser }) {
                             {form.status}
                           </span>
                         </td>
-                        <td style={{ color: '#6b7280' }}>{new Date(form.submittedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</td>
+                        <td style={{ color: '#111827', fontWeight: '500' }}>
+                          {form.timeline?.launchDate ? 
+                            new Date(form.timeline.launchDate).toLocaleDateString('en-US', { 
+                              year: 'numeric', 
+                              month: 'short', 
+                              day: 'numeric' 
+                            }) 
+                            : 'N/A'}
+                        </td>
+                        <td>
+                          {form.timeline?.urgent === 'yes' ? (
+                            <span style={{ 
+                              padding: '4px 8px', 
+                              borderRadius: '6px', 
+                              background: '#fee2e2', 
+                              color: '#991b1b',
+                              fontSize: '12px',
+                              fontWeight: '600'
+                            }}>
+                              🔴 URGENT
+                            </span>
+                          ) : form.timeline?.urgent === 'no' ? (
+                            <span style={{ 
+                              padding: '4px 8px', 
+                              borderRadius: '6px', 
+                              background: '#dbeafe', 
+                              color: '#1e40af',
+                              fontSize: '12px',
+                              fontWeight: '600'
+                            }}>
+                              Standard
+                            </span>
+                          ) : (
+                            <span style={{ fontSize: '13px', color: '#6b7280' }}>Flexible</span>
+                          )}
+                        </td>
+                        <td style={{ color: '#6b7280' }}>
+                          {new Date(form.submittedAt).toLocaleDateString('en-US', { 
+                            year: 'numeric', 
+                            month: 'short', 
+                            day: 'numeric' 
+                          })}
+                        </td>
                         <td>
                           <button 
                             onClick={() => navigate(`/admin/form/${form._id}`)}
                             className="btn btn-primary"
-                            style={{ padding: '8px 16px', fontSize: '14px' }}
+                            style={{ padding: '8px 16px', fontSize: '14px', whiteSpace: 'nowrap' }}
                           >
-                            Manage
+                            View Full Details
                           </button>
                         </td>
                       </tr>
@@ -362,7 +434,7 @@ function AdminDashboard({ user, setUser }) {
                       border: '1px solid #fbbf24'
                     }}>
                       <p style={{ fontSize: '14px', color: '#92400e' }}>
-                        <strong>Default Password:</strong> 12345
+                        <strong>Default Password:</strong> 1235
                         <br />
                         <span style={{ fontSize: '13px' }}>The employee can use this password to log in.</span>
                       </p>

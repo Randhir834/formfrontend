@@ -2,12 +2,18 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getAssignmentDetail } from '../utils/api';
 import { getImageUrl } from '../utils/api';
+import ImageModal from '../components/ImageModal';
 
 function EmployeeAssignmentDetail({ user }) {
   const { id } = useParams();
   const navigate = useNavigate();
   const [form, setForm] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [imageModal, setImageModal] = useState({
+    isOpen: false,
+    imageUrl: '',
+    imageTitle: ''
+  });
 
   useEffect(() => {
     fetchFormDetails();
@@ -31,6 +37,22 @@ function EmployeeAssignmentDetail({ user }) {
     }
   };
 
+  const openImageModal = (imageUrl, imageTitle = 'Image') => {
+    setImageModal({
+      isOpen: true,
+      imageUrl: imageUrl,
+      imageTitle: imageTitle
+    });
+  };
+
+  const closeImageModal = () => {
+    setImageModal({
+      isOpen: false,
+      imageUrl: '',
+      imageTitle: ''
+    });
+  };
+
   if (loading) return <div className="loading">Loading...</div>;
   if (!form) return <div className="error">Assignment not found</div>;
 
@@ -52,11 +74,16 @@ function EmployeeAssignmentDetail({ user }) {
     return (
       <div className="form-section">
         <h3>{title}</h3>
+        <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '12px' }}>Click any image to view full size</p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '16px', marginTop: '16px' }}>
           {images.map((img, index) => {
             const imageUrl = typeof img === 'object' ? (img.publicUrl || img.url) : img;
             return (
-              <div key={index} style={{ border: '1px solid #e5e7eb', borderRadius: '8px', overflow: 'hidden' }}>
+              <div 
+                key={index} 
+                style={{ border: '1px solid #e5e7eb', borderRadius: '8px', overflow: 'hidden', cursor: 'pointer', position: 'relative' }}
+                onClick={() => openImageModal(getImageUrl(imageUrl), `${title} ${index + 1}`)}
+              >
                 <img 
                   src={getImageUrl(imageUrl)} 
                   alt={`Reference ${index + 1}`}
@@ -66,6 +93,9 @@ function EmployeeAssignmentDetail({ user }) {
                     e.target.parentElement.innerHTML = '<div style="padding: 20px; text-align: center; background: #f3f4f6; height: 200px; display: flex; align-items: center; justify-content: center; color: #6b7280;">Image not available</div>';
                   }}
                 />
+                <div style={{ position: 'absolute', bottom: '8px', right: '8px', background: 'rgba(0,0,0,0.7)', color: 'white', padding: '4px 8px', borderRadius: '6px', fontSize: '12px', fontWeight: '600' }}>
+                  Click to enlarge
+                </div>
               </div>
             );
           })}
@@ -194,16 +224,25 @@ function EmployeeAssignmentDetail({ user }) {
           {form.logo && (
             <div className="form-section">
               <h3>Company Logo</h3>
+              <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '12px' }}>Click to view full size</p>
               <div style={{ marginTop: '16px' }}>
-                <img 
-                  src={getImageUrl(form.logo.publicUrl || form.logo.url || form.logo)} 
-                  alt="Company Logo"
-                  style={{ maxWidth: '300px', maxHeight: '200px', border: '1px solid #e5e7eb', borderRadius: '8px' }}
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                    e.target.parentElement.innerHTML = '<div style="padding: 20px; background: #f3f4f6; color: #6b7280; border-radius: 8px;">Logo not available</div>';
-                  }}
-                />
+                <div 
+                  style={{ display: 'inline-block', cursor: 'pointer', border: '1px solid #e5e7eb', borderRadius: '8px', overflow: 'hidden', position: 'relative' }}
+                  onClick={() => openImageModal(getImageUrl(form.logo.publicUrl || form.logo.url || form.logo), 'Company Logo')}
+                >
+                  <img 
+                    src={getImageUrl(form.logo.publicUrl || form.logo.url || form.logo)} 
+                    alt="Company Logo"
+                    style={{ maxWidth: '300px', maxHeight: '200px', display: 'block' }}
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.parentElement.innerHTML = '<div style="padding: 20px; background: #f3f4f6; color: #6b7280; border-radius: 8px;">Logo not available</div>';
+                    }}
+                  />
+                  <div style={{ position: 'absolute', bottom: '8px', right: '8px', background: 'rgba(0,0,0,0.7)', color: 'white', padding: '4px 8px', borderRadius: '6px', fontSize: '12px', fontWeight: '600' }}>
+                    Click to enlarge
+                  </div>
+                </div>
               </div>
             </div>
           )}
@@ -278,16 +317,30 @@ function EmployeeAssignmentDetail({ user }) {
                       <p style={{ color: '#374151', marginBottom: '12px' }}>{update.comment}</p>
                     )}
                     {update.progress_images && update.progress_images.length > 0 && (
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '12px', marginTop: '12px' }}>
-                        {update.progress_images.map((img, idx) => (
-                          <img 
-                            key={idx}
-                            src={getImageUrl(img.publicUrl || img.url || img)} 
-                            alt={`Progress ${idx + 1}`}
-                            style={{ width: '100%', height: '150px', objectFit: 'cover', borderRadius: '6px' }}
-                            onError={(e) => e.target.style.display = 'none'}
-                          />
-                        ))}
+                      <div>
+                        <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '8px' }}>Click any image to view full size</p>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '12px', marginTop: '12px' }}>
+                          {update.progress_images.map((img, idx) => {
+                            const imageUrl = getImageUrl(img.publicUrl || img.url || img);
+                            return (
+                              <div 
+                                key={idx}
+                                style={{ position: 'relative', cursor: 'pointer', borderRadius: '6px', overflow: 'hidden' }}
+                                onClick={() => openImageModal(imageUrl, `Progress Image ${idx + 1}`)}
+                              >
+                                <img 
+                                  src={imageUrl} 
+                                  alt={`Progress ${idx + 1}`}
+                                  style={{ width: '100%', height: '150px', objectFit: 'cover' }}
+                                  onError={(e) => e.target.style.display = 'none'}
+                                />
+                                <div style={{ position: 'absolute', bottom: '4px', right: '4px', background: 'rgba(0,0,0,0.7)', color: 'white', padding: '2px 6px', borderRadius: '4px', fontSize: '11px', fontWeight: '600' }}>
+                                  Click to enlarge
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
                       </div>
                     )}
                   </div>
@@ -297,6 +350,14 @@ function EmployeeAssignmentDetail({ user }) {
           )}
         </div>
       </div>
+
+      {/* Image Modal */}
+      <ImageModal
+        isOpen={imageModal.isOpen}
+        imageUrl={imageModal.imageUrl}
+        imageTitle={imageModal.imageTitle}
+        onClose={closeImageModal}
+      />
     </div>
   );
 }

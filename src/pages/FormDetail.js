@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getForm, submitFeedback, getImageUrl } from '../utils/api';
+import ImageModal from '../components/ImageModal';
 
 function FormDetail() {
   const { id } = useParams();
@@ -9,6 +10,11 @@ function FormDetail() {
   const [loading, setLoading] = useState(true);
   const [feedbackData, setFeedbackData] = useState({});
   const [submittingFeedback, setSubmittingFeedback] = useState({});
+  const [imageModal, setImageModal] = useState({
+    isOpen: false,
+    imageUrl: '',
+    imageTitle: ''
+  });
 
   useEffect(() => {
     fetchForm();
@@ -85,6 +91,22 @@ function FormDetail() {
     } finally {
       setSubmittingFeedback(prev => ({ ...prev, [updateId]: false }));
     }
+  };
+
+  const openImageModal = (imageUrl, imageTitle = 'Image') => {
+    setImageModal({
+      isOpen: true,
+      imageUrl: imageUrl,
+      imageTitle: imageTitle
+    });
+  };
+
+  const closeImageModal = () => {
+    setImageModal({
+      isOpen: false,
+      imageUrl: '',
+      imageTitle: ''
+    });
   };
 
   if (loading) return <div className="loading">Loading...</div>;
@@ -238,19 +260,36 @@ function FormDetail() {
           {form.logo && (
             <div style={{ marginBottom: '40px' }}>
               <h3 style={{ color: '#111827', marginBottom: '20px', fontSize: '17px', fontWeight: '600' }}>Product Logo</h3>
-              <div style={{ display: 'inline-block', padding: '16px', background: '#f9fafb', borderRadius: '12px', border: '1px solid #e5e7eb' }}>
+              <div 
+                style={{ display: 'inline-block', padding: '16px', background: '#f9fafb', borderRadius: '12px', border: '1px solid #e5e7eb', cursor: 'pointer' }}
+                onClick={() => openImageModal(getImageUrl(form.logo.publicUrl), 'Product Logo')}
+              >
                 <img src={getImageUrl(form.logo.publicUrl)} alt="Product Logo" style={{ maxWidth: '250px', maxHeight: '250px', objectFit: 'contain', borderRadius: '8px' }} />
               </div>
+              <p style={{ fontSize: '13px', color: '#6b7280', marginTop: '8px' }}>Click to view full size</p>
             </div>
           )}
 
           {form.referenceImages && form.referenceImages.length > 0 && (
             <div style={{ marginBottom: '40px' }}>
               <h3 style={{ color: '#111827', marginBottom: '20px', fontSize: '17px', fontWeight: '600' }}>Reference Images</h3>
+              <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '12px' }}>Click any image to view full size</p>
               <div className="image-preview">
-                {form.referenceImages.map((img, index) => (
-                  <img key={index} src={getImageUrl(img.publicUrl || img.imageUrl)} alt={`Reference ${index + 1}`} style={{ borderRadius: '12px', border: '1px solid #e5e7eb' }} />
-                ))}
+                {form.referenceImages.map((img, index) => {
+                  const imageUrl = getImageUrl(img.publicUrl || img.imageUrl);
+                  return (
+                    <div 
+                      key={index} 
+                      style={{ position: 'relative', borderRadius: '12px', border: '1px solid #e5e7eb', cursor: 'pointer', overflow: 'hidden' }}
+                      onClick={() => openImageModal(imageUrl, `Reference Image ${index + 1}`)}
+                    >
+                      <img src={imageUrl} alt={`Reference ${index + 1}`} style={{ borderRadius: '12px', border: '1px solid #e5e7eb', width: '100%', height: '100%', objectFit: 'cover' }} />
+                      <div style={{ position: 'absolute', bottom: '8px', right: '8px', background: 'rgba(0,0,0,0.7)', color: 'white', padding: '4px 8px', borderRadius: '6px', fontSize: '12px', fontWeight: '600' }}>
+                        Click to enlarge
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
@@ -281,9 +320,21 @@ function FormDetail() {
                     <p style={{ fontSize: '15px', color: '#111827', marginBottom: '12px', lineHeight: '1.6' }}>{update.comment}</p>
                     {update.progress_images && update.progress_images.length > 0 && (
                       <div className="image-preview" style={{ marginTop: '16px' }}>
-                        {update.progress_images.map((img, idx) => (
-                          <img key={idx} src={getImageUrl(img.publicUrl || img.imageUrl)} alt={`Progress ${idx + 1}`} style={{ borderRadius: '12px', border: '1px solid #e5e7eb' }} />
-                        ))}
+                        {update.progress_images.map((img, idx) => {
+                          const imageUrl = getImageUrl(img.publicUrl || img.imageUrl);
+                          return (
+                            <div 
+                              key={idx} 
+                              style={{ position: 'relative', cursor: 'pointer', borderRadius: '12px', overflow: 'hidden' }}
+                              onClick={() => openImageModal(imageUrl, `Progress Image ${idx + 1}`)}
+                            >
+                              <img src={imageUrl} alt={`Progress ${idx + 1}`} style={{ borderRadius: '12px', border: '1px solid #e5e7eb', width: '100%', height: '100%', objectFit: 'cover' }} />
+                              <div style={{ position: 'absolute', bottom: '8px', right: '8px', background: 'rgba(0,0,0,0.7)', color: 'white', padding: '4px 8px', borderRadius: '6px', fontSize: '12px', fontWeight: '600' }}>
+                                Click to enlarge
+                              </div>
+                            </div>
+                          );
+                        })}
                       </div>
                     )}
                   </div>
@@ -310,9 +361,21 @@ function FormDetail() {
                           <p style={{ fontSize: '14px', color: '#374151', lineHeight: '1.6', marginBottom: '8px' }}>{feedback.comment}</p>
                           {feedback.feedback_images && feedback.feedback_images.length > 0 && (
                             <div className="image-preview" style={{ marginTop: '12px' }}>
-                              {feedback.feedback_images.map((img, imgIdx) => (
-                                <img key={imgIdx} src={getImageUrl(img.publicUrl || img.imageUrl)} alt={`Feedback ${imgIdx + 1}`} style={{ borderRadius: '8px', border: '1px solid #e5e7eb', maxHeight: '150px' }} />
-                              ))}
+                              {feedback.feedback_images.map((img, imgIdx) => {
+                                const imageUrl = getImageUrl(img.publicUrl || img.imageUrl);
+                                return (
+                                  <div 
+                                    key={imgIdx} 
+                                    style={{ position: 'relative', cursor: 'pointer', borderRadius: '8px', overflow: 'hidden' }}
+                                    onClick={() => openImageModal(imageUrl, `Feedback Image ${imgIdx + 1}`)}
+                                  >
+                                    <img src={imageUrl} alt={`Feedback ${imgIdx + 1}`} style={{ borderRadius: '8px', border: '1px solid #e5e7eb', maxHeight: '150px', width: '100%', objectFit: 'cover' }} />
+                                    <div style={{ position: 'absolute', bottom: '4px', right: '4px', background: 'rgba(0,0,0,0.7)', color: 'white', padding: '2px 6px', borderRadius: '4px', fontSize: '11px', fontWeight: '600' }}>
+                                      Click to enlarge
+                                    </div>
+                                  </div>
+                                );
+                              })}
                             </div>
                           )}
                         </div>
@@ -376,6 +439,14 @@ function FormDetail() {
           )}
         </div>
       </div>
+
+      {/* Image Modal */}
+      <ImageModal
+        isOpen={imageModal.isOpen}
+        imageUrl={imageModal.imageUrl}
+        imageTitle={imageModal.imageTitle}
+        onClose={closeImageModal}
+      />
     </div>
   );
 }

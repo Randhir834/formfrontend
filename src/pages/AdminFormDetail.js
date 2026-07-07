@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getForm, updateFormStatus, getImageUrl, getEmployeeList, assignFormToEmployee, unassignForm } from '../utils/api';
+import ImageModal from '../components/ImageModal';
 
 function AdminFormDetail() {
   const { id } = useParams();
@@ -147,6 +148,140 @@ function AdminFormDetail() {
     }
   };
 
+  const downloadAllData = () => {
+    // Create a comprehensive text report
+    let report = `FORM SUBMISSION COMPLETE DATA REPORT
+========================================
+Generated: ${new Date().toLocaleString()}
+
+SUBMISSION OVERVIEW
+------------------
+Submitted By: ${form.userId?.name || 'N/A'} (${form.userId?.email || 'N/A'})
+Submission Date: ${new Date(form.submittedAt).toLocaleString()}
+Status: ${form.status}
+Priority: ${form.timeline?.urgent === 'yes' ? 'URGENT' : form.timeline?.urgent === 'no' ? 'Standard' : 'Flexible'}
+Approval Confirmed: ${form.approvalConfirmed ? 'Yes' : 'No'}
+${form.assignedTo ? `Assigned To: ${form.assignedTo.name} (${form.assignedTo.email})` : 'Assigned To: Unassigned'}
+
+CLIENT INFORMATION
+------------------
+Company Name: ${form.clientInfo?.companyName || 'N/A'}
+Brand Name: ${form.clientInfo?.brandName || 'N/A'}
+Contact Person: ${form.clientInfo?.contactPerson || 'N/A'}
+Mobile Number: ${form.clientInfo?.mobileNumber || 'N/A'}
+Email: ${form.clientInfo?.email || 'N/A'}
+FSSAI Number: ${form.clientInfo?.fssaiNumber || 'N/A'}
+Manufacturer Name: ${form.clientInfo?.manufacturerName || 'N/A'}
+Manufacturer Address: ${form.clientInfo?.manufacturerAddress || 'N/A'}
+Marketed By: ${form.clientInfo?.marketedBy || 'N/A'}
+Marketed By Address: ${form.clientInfo?.marketedByAddress || 'N/A'}
+
+PRODUCT INFORMATION
+-------------------
+Product Name: ${form.productInfo?.productName || 'N/A'}
+Product Category: ${form.productInfo?.productCategory || 'N/A'}
+Product Variant: ${form.productInfo?.productVariant || 'N/A'}
+Product Weight: ${form.productInfo?.productWeight || 'N/A'}
+Product Dimensions: ${form.productInfo?.productDimensions || 'N/A'}
+MRP: ${form.productInfo?.mrp ? `₹${form.productInfo.mrp}` : 'N/A'}
+Shelf Life: ${form.productInfo?.shelfLife || 'N/A'}
+Storage Instructions: ${form.productInfo?.storageInstructions || 'N/A'}
+
+Ingredients: ${form.productInfo?.ingredients || 'N/A'}
+${form.ingredientsPdf ? `Ingredients PDF: ${form.ingredientsPdf.publicUrl}` : ''}
+
+Nutritional Facts: ${form.productInfo?.nutritionalFacts || 'N/A'}
+${form.nutritionalFactsPdf ? `Nutritional Facts PDF: ${form.nutritionalFactsPdf.publicUrl}` : ''}
+
+Allergen Information: ${form.productInfo?.allergenInformation || 'N/A'}
+Directions for Use: ${form.productInfo?.directionsForUse || 'N/A'}
+
+${form.logo ? `Product Logo: ${form.logo.publicUrl}` : 'Product Logo: N/A'}
+
+TARGET CUSTOMER
+---------------
+Gender: ${form.targetCustomer?.targetGender || 'N/A'}
+Age Group: ${form.targetCustomer?.targetAge || 'N/A'}
+Income Level: ${form.targetCustomer?.targetIncome || 'N/A'}
+Location Type: ${form.targetCustomer?.targetLocation || 'N/A'}
+Buyer Channel: ${form.targetCustomer?.buyerChannel || 'N/A'}
+Buyer Segment: ${form.targetCustomer?.buyerSegment || 'N/A'}
+Business Model: ${form.targetCustomer?.businessModel || 'N/A'}
+
+PACKAGE SPECIFICATIONS
+---------------------
+Package Type: ${form.packageSpec?.packageType || 'N/A'}
+Package Material: ${form.packageSpec?.packageMaterial || 'N/A'}
+Package Finish: ${form.packageSpec?.packageFinish || 'N/A'}
+Additional Notes: ${form.packageSpec?.packageNotes || 'N/A'}
+
+DESIGN DIRECTION
+----------------
+Primary Color: ${form.designDirection?.primaryColor || 'N/A'}
+Secondary Color: ${form.designDirection?.secondaryColor || 'N/A'}
+Accent Color: ${form.designDirection?.accentColor || 'N/A'}
+Colors to Avoid: ${form.designDirection?.colorsToAvoid || 'N/A'}
+Typography Style: ${form.designDirection?.typographyStyle || 'N/A'}
+Design Density: ${form.designDirection?.designDensity || 'N/A'}
+Brand Perception: ${form.designDirection?.brandPerception || 'N/A'}
+Design Aesthetic: ${form.designDirection?.designAesthetic || 'N/A'}
+Visual Elements: ${form.designDirection?.visualElements || 'N/A'}
+Imagery Style: ${form.designDirection?.imageryStyle || 'N/A'}
+Design Inspiration: ${form.designDirection?.designInspiration || 'N/A'}
+Additional Design Notes: ${form.designDirection?.additionalNotes || 'N/A'}
+
+TIMELINE
+--------
+Launch Date: ${form.timeline?.launchDate ? new Date(form.timeline.launchDate).toLocaleDateString() : 'N/A'}
+Printing Date: ${form.timeline?.printingDate ? new Date(form.timeline.printingDate).toLocaleDateString() : 'N/A'}
+Expected Delivery: ${form.timeline?.expectedDelivery ? new Date(form.timeline.expectedDelivery).toLocaleDateString() : 'N/A'}
+Timeline Notes: ${form.timeline?.timelineNotes || 'N/A'}
+
+REFERENCE IMAGES
+----------------
+${form.referenceImages && form.referenceImages.length > 0 ? 
+  form.referenceImages.map((img, index) => 
+    `Reference Image ${index + 1}: ${getImageUrl(img.publicUrl || img.imageUrl)}`
+  ).join('\n') : 'No reference images'}
+
+${form.adminUpdates && form.adminUpdates.length > 0 ? `
+ADMIN UPDATES & USER FEEDBACK
+------------------------------
+${form.adminUpdates.map((update, index) => `
+Update #${index + 1}
+Date: ${new Date(update.created_at).toLocaleString()}
+Admin: ${update.users?.name || 'Admin'}
+Status: ${update.status}
+Comment: ${update.comment}
+${update.progress_images && update.progress_images.length > 0 ? 
+  `Progress Images:\n${update.progress_images.map((img, idx) => `  - ${getImageUrl(img.publicUrl)}`).join('\n')}` : ''}
+
+${update.userFeedback && update.userFeedback.length > 0 ? 
+  `User Responses:\n${update.userFeedback.map((fb, fbIdx) => `
+  Feedback #${fbIdx + 1}
+  Date: ${new Date(fb.created_at).toLocaleString()}
+  User: ${fb.users?.name || 'User'}
+  Comment: ${fb.comment}
+  ${fb.feedback_images && fb.feedback_images.length > 0 ? 
+    `Images:\n${fb.feedback_images.map((img) => `    - ${getImageUrl(img.publicUrl)}`).join('\n')}` : ''}`).join('\n')}` : ''}
+`).join('\n')}` : ''}
+
+========================================
+END OF REPORT
+`;
+
+    // Create and download the file
+    const blob = new Blob([report], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `form-${form._id}-${form.clientInfo?.companyName || 'data'}-${new Date().toISOString().split('T')[0]}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  };
+
   if (loading) return <div className="loading">Loading...</div>;
   if (!form) return null;
 
@@ -155,6 +290,13 @@ function AdminFormDetail() {
       <div className="navbar">
         <h2>Innovative Media Form System • Admin</h2>
         <div className="navbar-right">
+          <button 
+            onClick={downloadAllData} 
+            className="btn btn-primary"
+            style={{ marginRight: '12px', background: '#059669' }}
+          >
+            📥 Download Complete Data
+          </button>
           <button onClick={() => navigate('/admin')} className="btn btn-secondary">
             ← Back to Admin
           </button>
@@ -162,12 +304,93 @@ function AdminFormDetail() {
       </div>
 
       <div className="container">
+        {/* Submission Summary Card */}
+        <div className="card" style={{ marginBottom: '24px', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white', border: 'none' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+            <div>
+              <h2 style={{ fontSize: '28px', fontWeight: '700', marginBottom: '12px', color: 'white' }}>
+                {form.productInfo?.productName || 'N/A'}
+              </h2>
+              <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap', marginBottom: '12px' }}>
+                <div>
+                  <p style={{ fontSize: '13px', opacity: '0.9', marginBottom: '4px' }}>Company</p>
+                  <p style={{ fontSize: '16px', fontWeight: '600' }}>{form.clientInfo?.companyName || 'N/A'}</p>
+                </div>
+                <div>
+                  <p style={{ fontSize: '13px', opacity: '0.9', marginBottom: '4px' }}>Brand</p>
+                  <p style={{ fontSize: '16px', fontWeight: '600' }}>{form.clientInfo?.brandName || 'N/A'}</p>
+                </div>
+                <div>
+                  <p style={{ fontSize: '13px', opacity: '0.9', marginBottom: '4px' }}>MRP</p>
+                  <p style={{ fontSize: '16px', fontWeight: '600' }}>₹{form.productInfo?.mrp || 'N/A'}</p>
+                </div>
+                <div>
+                  <p style={{ fontSize: '13px', opacity: '0.9', marginBottom: '4px' }}>Launch Date</p>
+                  <p style={{ fontSize: '16px', fontWeight: '600' }}>
+                    {form.timeline?.launchDate ? 
+                      new Date(form.timeline.launchDate).toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'short', 
+                        day: 'numeric' 
+                      }) 
+                      : 'N/A'}
+                  </p>
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
+                <span className={`status-badge status-${form.status}`} style={{ fontSize: '14px', padding: '6px 14px' }}>
+                  {form.status}
+                </span>
+                {form.timeline?.urgent === 'yes' && (
+                  <span style={{ 
+                    padding: '6px 14px', 
+                    borderRadius: '8px', 
+                    background: 'rgba(239, 68, 68, 0.2)', 
+                    color: 'white',
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    border: '1px solid rgba(255, 255, 255, 0.3)'
+                  }}>
+                    🔴 URGENT
+                  </span>
+                )}
+                {form.approvalConfirmed && (
+                  <span style={{ 
+                    padding: '6px 14px', 
+                    borderRadius: '8px', 
+                    background: 'rgba(34, 197, 94, 0.2)', 
+                    color: 'white',
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    border: '1px solid rgba(255, 255, 255, 0.3)'
+                  }}>
+                    ✓ Approval Confirmed
+                  </span>
+                )}
+              </div>
+            </div>
+            <div style={{ textAlign: 'right' }}>
+              <p style={{ fontSize: '13px', opacity: '0.9', marginBottom: '4px' }}>Submitted By</p>
+              <p style={{ fontSize: '16px', fontWeight: '600', marginBottom: '12px' }}>{form.userId?.name || 'N/A'}</p>
+              <p style={{ fontSize: '13px', opacity: '0.8' }}>
+                {new Date(form.submittedAt).toLocaleString('en-US', { 
+                  year: 'numeric', 
+                  month: 'short', 
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+              </p>
+            </div>
+          </div>
+        </div>
+
         <div className="grid" style={{ gridTemplateColumns: '2fr 1fr', alignItems: 'start', gap: '24px' }}>
           {/* Form Details */}
           <div className="card">
             <div style={{ marginBottom: '32px', paddingBottom: '24px', borderBottom: '1px solid #f3f4f6' }}>
-              <h2 style={{ fontSize: '24px', fontWeight: '700', marginBottom: '8px', color: '#111827' }}>Form Details</h2>
-              <p style={{ color: '#6b7280', fontSize: '15px' }}>Review submission and update status</p>
+              <h2 style={{ fontSize: '24px', fontWeight: '700', marginBottom: '8px', color: '#111827' }}>Complete Form Data</h2>
+              <p style={{ color: '#6b7280', fontSize: '15px' }}>All information submitted by the user</p>
             </div>
 
             <div style={{ marginBottom: '32px' }}>
@@ -879,6 +1102,14 @@ function AdminFormDetail() {
           </div>
         </div>
       )}
+
+      {/* Image Modal */}
+      <ImageModal
+        isOpen={imageModal.isOpen}
+        imageUrl={imageModal.imageUrl}
+        imageTitle={imageModal.imageTitle}
+        onClose={closeImageModal}
+      />
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getForm, updateForm, getImageUrl } from '../utils/api';
+import ImageModal from '../components/ImageModal';
 
 function FormEdit() {
   const navigate = useNavigate();
@@ -24,6 +25,12 @@ function FormEdit() {
   const [deleteIngredientsPdf, setDeleteIngredientsPdf] = useState(false);
   
   const [approvalConfirmed, setApprovalConfirmed] = useState(false);
+  
+  const [imageModal, setImageModal] = useState({
+    isOpen: false,
+    imageUrl: '',
+    imageTitle: ''
+  });
   
   const [formData, setFormData] = useState({
     clientInfo: {
@@ -108,6 +115,22 @@ function FormEdit() {
 
   const getTotalImageCount = () => {
     return existingImages.length - deletedImages.length + newImages.length;
+  };
+
+  const openImageModal = (imageUrl, imageTitle = 'Image') => {
+    setImageModal({
+      isOpen: true,
+      imageUrl: imageUrl,
+      imageTitle: imageTitle
+    });
+  };
+
+  const closeImageModal = () => {
+    setImageModal({
+      isOpen: false,
+      imageUrl: '',
+      imageTitle: ''
+    });
   };
 
   const handleLogoChange = (e) => {
@@ -420,10 +443,16 @@ function FormEdit() {
                   {existingLogo && !deleteLogo && (
                     <div style={{ marginBottom: '12px', padding: '16px', background: '#f9fafb', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <img src={getImageUrl(existingLogo.publicUrl)} alt="Current Logo" style={{ maxWidth: '100px', maxHeight: '100px', objectFit: 'contain', borderRadius: '6px' }} />
+                        <img 
+                          src={getImageUrl(existingLogo.publicUrl)} 
+                          alt="Current Logo" 
+                          style={{ maxWidth: '100px', maxHeight: '100px', objectFit: 'contain', borderRadius: '6px', cursor: 'pointer', border: '1px solid #d1d5db' }} 
+                          onClick={() => openImageModal(getImageUrl(existingLogo.publicUrl), 'Current Product Logo')}
+                        />
                         <div style={{ flex: 1 }}>
                           <p style={{ fontSize: '14px', fontWeight: '500', color: '#111827', marginBottom: '4px' }}>Current Logo</p>
                           <p style={{ fontSize: '13px', color: '#6b7280' }}>{existingLogo.filename}</p>
+                          <p style={{ fontSize: '12px', color: '#9ca3af', marginTop: '4px' }}>Click image to view full size</p>
                         </div>
                         <button type="button" onClick={handleDeleteLogo} style={{ padding: '8px 16px', background: '#fee2e2', color: '#991b1b', border: '1px solid #fecaca', borderRadius: '6px', fontSize: '14px', fontWeight: '500', cursor: 'pointer' }}>
                           Remove
@@ -447,18 +476,18 @@ function FormEdit() {
                 
                 {/* Ingredients */}
                 <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-                  <label>Ingredients</label>
+                  <label>Ingredients <span style={{ fontSize: '13px', color: '#6b7280', fontWeight: '400' }}>(Optional)</span></label>
                   <div style={{ marginBottom: '12px' }}>
                     <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '8px' }}>
-                      Enter ingredients as text or upload a PDF (or both)
+                      Enter ingredients as text or upload a PDF (or both) - This field is optional
                     </p>
                     <textarea value={formData.productInfo.ingredients}
                       onChange={(e) => handleInputChange('productInfo', 'ingredients', e.target.value)}
-                      placeholder="List all ingredients in order of quantity (optional if PDF is uploaded)" rows="3" />
+                      placeholder="List all ingredients in order of quantity (optional)" rows="3" />
                   </div>
                   <div>
                     <label style={{ fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '8px', display: 'block' }}>
-                      Or Upload Ingredients PDF
+                      Or Upload Ingredients PDF <span style={{ fontSize: '13px', color: '#6b7280', fontWeight: '400' }}>(Optional)</span>
                     </label>
                     {existingIngredientsPdf && !deleteIngredientsPdf && (
                       <div style={{ marginBottom: '12px', padding: '12px', background: '#f9fafb', borderRadius: '8px', border: '1px solid #e5e7eb', display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -488,18 +517,18 @@ function FormEdit() {
                 
                 {/* Nutritional Facts */}
                 <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-                  <label>Nutritional Facts</label>
+                  <label>Nutritional Facts <span style={{ fontSize: '13px', color: '#6b7280', fontWeight: '400' }}>(Optional)</span></label>
                   <div style={{ marginBottom: '12px' }}>
                     <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '8px' }}>
-                      Enter nutritional facts as text or upload a PDF (or both)
+                      Enter nutritional facts as text or upload a PDF (or both) - This field is optional
                     </p>
                     <textarea value={formData.productInfo.nutritionalFacts}
                       onChange={(e) => handleInputChange('productInfo', 'nutritionalFacts', e.target.value)}
-                      placeholder="Per serving: Energy, Protein, Carbs, Fat, Fiber, etc. (optional if PDF is uploaded)" rows="4" />
+                      placeholder="Per serving: Energy, Protein, Carbs, Fat, Fiber, etc. (optional)" rows="4" />
                   </div>
                   <div>
                     <label style={{ fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '8px', display: 'block' }}>
-                      Or Upload Nutritional Facts PDF
+                      Or Upload Nutritional Facts PDF <span style={{ fontSize: '13px', color: '#6b7280', fontWeight: '400' }}>(Optional)</span>
                     </label>
                     {existingNutritionalPdf && !deleteNutritionalPdf && (
                       <div style={{ marginBottom: '12px', padding: '12px', background: '#f9fafb', borderRadius: '8px', border: '1px solid #e5e7eb', display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -777,10 +806,16 @@ function FormEdit() {
               {displayImages.length > 0 && (
                 <div style={{ marginBottom: '20px' }}>
                   <label style={{ fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Current Images</label>
+                  <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '8px' }}>Click any image to view full size</p>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '15px', marginTop: '15px' }}>
                     {displayImages.map((img, index) => (
                       <div key={index} style={{ position: 'relative' }}>
-                        <img src={getImageUrl(img.imageUrl)} alt={`Reference ${index + 1}`} style={{ width: '100%', height: '150px', objectFit: 'cover', borderRadius: '12px', border: '1px solid #e5e7eb' }} />
+                        <img 
+                          src={getImageUrl(img.imageUrl)} 
+                          alt={`Reference ${index + 1}`} 
+                          style={{ width: '100%', height: '150px', objectFit: 'cover', borderRadius: '12px', border: '1px solid #e5e7eb', cursor: 'pointer' }}
+                          onClick={() => openImageModal(getImageUrl(img.imageUrl), `Reference Image ${index + 1}`)}
+                        />
                         <button
                           type="button"
                           onClick={() => handleDeleteExistingImage(img.filename)}
@@ -798,11 +833,15 @@ function FormEdit() {
                             fontSize: '16px',
                             display: 'flex',
                             alignItems: 'center',
-                            justifyContent: 'center'
+                            justifyContent: 'center',
+                            zIndex: 10
                           }}
                         >
                           ×
                         </button>
+                        <div style={{ position: 'absolute', bottom: '8px', right: '8px', background: 'rgba(0,0,0,0.7)', color: 'white', padding: '4px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: '600' }}>
+                          Click to enlarge
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -813,34 +852,47 @@ function FormEdit() {
               {newImages.length > 0 && (
                 <div style={{ marginBottom: '20px' }}>
                   <label style={{ fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>New Images</label>
+                  <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '8px' }}>Click any image to view full size</p>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '15px', marginTop: '15px' }}>
-                    {newImages.map((file, index) => (
-                      <div key={index} style={{ position: 'relative' }}>
-                        <img src={URL.createObjectURL(file)} alt={`New ${index + 1}`} style={{ width: '100%', height: '150px', objectFit: 'cover', borderRadius: '12px', border: '1px solid #e5e7eb' }} />
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveNewImage(index)}
-                          style={{
-                            position: 'absolute',
-                            top: '8px',
-                            right: '8px',
-                            background: '#ef4444',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '50%',
-                            width: '28px',
-                            height: '28px',
-                            cursor: 'pointer',
-                            fontSize: '16px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                          }}
-                        >
-                          ×
-                        </button>
-                      </div>
-                    ))}
+                    {newImages.map((file, index) => {
+                      const previewUrl = URL.createObjectURL(file);
+                      return (
+                        <div key={index} style={{ position: 'relative' }}>
+                          <img 
+                            src={previewUrl} 
+                            alt={`New ${index + 1}`} 
+                            style={{ width: '100%', height: '150px', objectFit: 'cover', borderRadius: '12px', border: '1px solid #e5e7eb', cursor: 'pointer' }}
+                            onClick={() => openImageModal(previewUrl, `New Image ${index + 1}`)}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveNewImage(index)}
+                            style={{
+                              position: 'absolute',
+                              top: '8px',
+                              right: '8px',
+                              background: '#ef4444',
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: '50%',
+                              width: '28px',
+                              height: '28px',
+                              cursor: 'pointer',
+                              fontSize: '16px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              zIndex: 10
+                            }}
+                          >
+                            ×
+                          </button>
+                          <div style={{ position: 'absolute', bottom: '8px', right: '8px', background: 'rgba(0,0,0,0.7)', color: 'white', padding: '4px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: '600' }}>
+                            Click to enlarge
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -1025,6 +1077,14 @@ function FormEdit() {
           }
         }
       `}</style>
+
+      {/* Image Modal */}
+      <ImageModal
+        isOpen={imageModal.isOpen}
+        imageUrl={imageModal.imageUrl}
+        imageTitle={imageModal.imageTitle}
+        onClose={closeImageModal}
+      />
     </div>
   );
 }
