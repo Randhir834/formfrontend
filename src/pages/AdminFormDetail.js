@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getForm, updateFormStatus, getImageUrl } from '../utils/api';
+import { getForm, updateFormStatus, getImageUrl, getEmployeeList, assignFormToEmployee, unassignForm } from '../utils/api';
 
 function AdminFormDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [form, setForm] = useState(null);
+  const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [updateData, setUpdateData] = useState({
@@ -13,10 +14,27 @@ function AdminFormDetail() {
     comment: '',
     progressImages: []
   });
+  const [imageModal, setImageModal] = useState({
+    isOpen: false,
+    imageUrl: '',
+    imageTitle: ''
+  });
+  const [showAssignModal, setShowAssignModal] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState('');
 
   useEffect(() => {
     fetchForm();
+    fetchEmployees();
   }, [id]);
+
+  const fetchEmployees = async () => {
+    try {
+      const response = await getEmployeeList();
+      setEmployees(response.data.data);
+    } catch (error) {
+      console.error('Error fetching employees:', error);
+    }
+  };
 
   const fetchForm = async () => {
     try {
@@ -28,6 +46,34 @@ function AdminFormDetail() {
       navigate('/admin');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleAssign = async () => {
+    if (!selectedEmployee) {
+      alert('Please select an employee');
+      return;
+    }
+
+    try {
+      await assignFormToEmployee(id, selectedEmployee);
+      alert('Form assigned successfully!');
+      setShowAssignModal(false);
+      fetchForm();
+    } catch (error) {
+      alert(error.response?.data?.message || 'Failed to assign form');
+    }
+  };
+
+  const handleUnassign = async () => {
+    if (window.confirm('Are you sure you want to unassign this form?')) {
+      try {
+        await unassignForm(id);
+        alert('Form unassigned successfully!');
+        fetchForm();
+      } catch (error) {
+        alert(error.response?.data?.message || 'Failed to unassign form');
+      }
     }
   };
 
@@ -57,6 +103,47 @@ function AdminFormDetail() {
       alert('Error updating form: ' + (error.response?.data?.message || error.message));
     } finally {
       setUpdating(false);
+    }
+  };
+
+  const openImageModal = (imageUrl, imageTitle = 'Image') => {
+    setImageModal({
+      isOpen: true,
+      imageUrl: imageUrl,
+      imageTitle: imageTitle
+    });
+  };
+
+  const closeImageModal = () => {
+    setImageModal({
+      isOpen: false,
+      imageUrl: '',
+      imageTitle: ''
+    });
+  };
+
+  const handleImageError = (e) => {
+    console.error('Image failed to load:', e.target.src);
+    e.target.style.border = '2px solid #ef4444';
+    e.target.alt = 'Failed to load image';
+  };
+
+  const downloadImage = async (imageUrl, filename) => {
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename || 'image.jpg';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading image:', error);
+      alert('Failed to download image. Trying alternative method...');
+      window.open(imageUrl, '_blank');
     }
   };
 
@@ -206,8 +293,24 @@ function AdminFormDetail() {
             <div style={{ marginBottom: '32px' }}>
               <h3 style={{ color: '#111827', marginBottom: '20px', fontSize: '17px', fontWeight: '600' }}>Product Logo</h3>
               {form.logo ? (
-                <div style={{ display: 'inline-block', padding: '16px', background: '#f9fafb', borderRadius: '12px', border: '1px solid #e5e7eb' }}>
-                  <img src={getImageUrl(form.logo.publicUrl)} alt="Product Logo" style={{ maxWidth: '250px', maxHeight: '250px', objectFit: 'contain', borderRadius: '8px' }} />
+                <div style={{ display: 'inline-block', position: 'relative' }}>
+                  <div 
+                    style={{ padding: '16px', background: '#f9fafb', borderRadius: '12px', border: '2px solid #e5e7eb', cursor: 'pointer' }}
+                    onClick={() => openImageModal(getImageUrl(form.logo.publicUrl), 'Product Logo')}
+                  >
+                    <img 
+                      src={getImageUrl(form.logo.publicUrl)} 
+                      alt="Product Logo" 
+                      style={{ maxWidth: '250px', maxHeight: '250px', objectFit: 'contain', borderRadius: '8px' }}
+                      onError={handleImageError}
+                    />
+                  </div>
+                  <button 
+                    onClick={() => downloadImage(getImageUrl(form.logo.publicUrl), 'product-logo.jpg')}
+                    style={{ marginTop: '12px', background: '#2563eb', color: 'white', border: 'none', borderRadius: '8px', padding: '8px 16px', fontSize: '14px', cursor: 'pointer', fontWeight: '600' }}
+                  >
+                    📥 Download Logo
+                  </button>
                 </div>
               ) : (
                 <p style={{ fontSize: '15px', color: '#6b7280' }}>N/A</p>
@@ -376,10 +479,30 @@ function AdminFormDetail() {
             <div style={{ marginBottom: '32px' }}>
               <h3 style={{ color: '#111827', marginBottom: '20px', fontSize: '17px', fontWeight: '600' }}>Reference Images</h3>
               {form.referenceImages && form.referenceImages.length > 0 ? (
-                <div className="image-preview">
-                  {form.referenceImages.map((img, index) => (
-                    <img key={index} src={getImageUrl(img.publicUrl || img.imageUrl)} alt={`Reference ${index + 1}`} style={{ borderRadius: '12px', border: '1px solid #e5e7eb' }} />
-                  ))}
+                <div className="image-preview" style={{ gap: '16px' }}>
+                  {form.referenceImages.map((img, index) => {
+                    const imageUrl = getImageUrl(img.publicUrl || img.imageUrl);
+                    return (
+                      <div key={index} style={{ position: 'relative', borderRadius: '12px', overflow: 'hidden', border: '2px solid #e5e7eb', background: '#f9fafb', cursor: 'pointer' }}>
+                        <img 
+                          src={imageUrl} 
+                          alt={`Reference ${index + 1}`} 
+                          style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '12px' }}
+                          onClick={() => openImageModal(imageUrl, `Reference Image ${index + 1}`)}
+                          onError={handleImageError}
+                        />
+                        <div style={{ position: 'absolute', bottom: '0', left: '0', right: '0', background: 'linear-gradient(to top, rgba(0,0,0,0.7), transparent)', padding: '8px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span style={{ color: 'white', fontSize: '12px', fontWeight: '600' }}>Reference {index + 1}</span>
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); downloadImage(imageUrl, `reference-${index + 1}.jpg`); }}
+                            style={{ background: 'rgba(255,255,255,0.9)', border: 'none', borderRadius: '6px', padding: '4px 8px', fontSize: '12px', cursor: 'pointer', fontWeight: '600', color: '#111827' }}
+                          >
+                            📥 Download
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               ) : (
                 <p style={{ fontSize: '15px', color: '#6b7280' }}>N/A</p>
@@ -412,9 +535,19 @@ function AdminFormDetail() {
                       <p style={{ fontSize: '15px', color: '#111827', marginBottom: '12px', lineHeight: '1.6' }}>{update.comment}</p>
                       {update.progress_images && update.progress_images.length > 0 && (
                         <div className="image-preview" style={{ marginTop: '16px' }}>
-                          {update.progress_images.map((img, idx) => (
-                            <img key={idx} src={getImageUrl(img.publicUrl || img.imageUrl)} alt={`Progress ${idx + 1}`} style={{ borderRadius: '12px', border: '1px solid #e5e7eb' }} />
-                          ))}
+                          {update.progress_images.map((img, idx) => {
+                            const imageUrl = getImageUrl(img.publicUrl || img.imageUrl);
+                            return (
+                              <img 
+                                key={idx} 
+                                src={imageUrl} 
+                                alt={`Progress ${idx + 1}`} 
+                                style={{ borderRadius: '12px', border: '1px solid #e5e7eb', cursor: 'pointer' }}
+                                onClick={() => openImageModal(imageUrl, `Progress Image ${idx + 1}`)}
+                                onError={handleImageError}
+                              />
+                            );
+                          })}
                         </div>
                       )}
                     </div>
@@ -443,9 +576,19 @@ function AdminFormDetail() {
                             <p style={{ fontSize: '14px', color: '#374151', lineHeight: '1.6', marginBottom: '8px' }}>{feedback.comment}</p>
                             {feedback.feedback_images && feedback.feedback_images.length > 0 && (
                               <div className="image-preview" style={{ marginTop: '12px' }}>
-                                {feedback.feedback_images.map((img, imgIdx) => (
-                                  <img key={imgIdx} src={getImageUrl(img.publicUrl || img.imageUrl)} alt={`Feedback ${imgIdx + 1}`} style={{ borderRadius: '8px', border: '1px solid #e5e7eb', maxHeight: '150px' }} />
-                                ))}
+                                {feedback.feedback_images.map((img, imgIdx) => {
+                                  const imageUrl = getImageUrl(img.publicUrl || img.imageUrl);
+                                  return (
+                                    <img 
+                                      key={imgIdx} 
+                                      src={imageUrl} 
+                                      alt={`Feedback ${imgIdx + 1}`} 
+                                      style={{ borderRadius: '8px', border: '1px solid #e5e7eb', maxHeight: '150px', cursor: 'pointer' }}
+                                      onClick={() => openImageModal(imageUrl, `Feedback Image ${imgIdx + 1}`)}
+                                      onError={handleImageError}
+                                    />
+                                  );
+                                })}
                               </div>
                             )}
                           </div>
@@ -460,6 +603,44 @@ function AdminFormDetail() {
 
           {/* Update Form */}
           <div className="card" style={{ position: 'sticky', top: '24px' }}>
+            {/* Assignment Section */}
+            <div style={{ marginBottom: '32px', paddingBottom: '24px', borderBottom: '1px solid #f3f4f6' }}>
+              <h3 style={{ marginBottom: '16px', fontSize: '18px', fontWeight: '600', color: '#111827' }}>Assignment</h3>
+              {form.assignedTo ? (
+                <div style={{ background: '#f0fdf4', padding: '16px', borderRadius: '8px', border: '1px solid #86efac' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: '600' }}>
+                      {form.assignedTo.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <p style={{ fontSize: '15px', fontWeight: '600', color: '#111827' }}>{form.assignedTo.name}</p>
+                      <p style={{ fontSize: '13px', color: '#6b7280' }}>{form.assignedTo.email}</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleUnassign}
+                    className="btn btn-secondary"
+                    style={{ width: '100%', background: '#fee2e2', color: '#991b1b', border: '1px solid #fecaca' }}
+                  >
+                    Unassign
+                  </button>
+                </div>
+              ) : (
+                <div style={{ background: '#fef3c7', padding: '16px', borderRadius: '8px', border: '1px solid #fbbf24' }}>
+                  <p style={{ fontSize: '14px', color: '#92400e', marginBottom: '12px' }}>
+                    This form is not assigned to any employee yet.
+                  </p>
+                  <button
+                    onClick={() => setShowAssignModal(true)}
+                    className="btn btn-primary"
+                    style={{ width: '100%' }}
+                  >
+                    Assign to Employee
+                  </button>
+                </div>
+              )}
+            </div>
+
             <h3 style={{ marginBottom: '24px', fontSize: '18px', fontWeight: '600', color: '#111827' }}>Update Status</h3>
             <form onSubmit={handleUpdate}>
               <div className="form-group">
@@ -511,6 +692,193 @@ function AdminFormDetail() {
           </div>
         </div>
       </div>
+
+      {/* Image Modal */}
+      {imageModal.isOpen && (
+        <div 
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.95)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 9999,
+            padding: '20px'
+          }}
+          onClick={closeImageModal}
+        >
+          <div 
+            style={{
+              position: 'relative',
+              maxWidth: '95vw',
+              maxHeight: '95vh',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div style={{
+              width: '100%',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '20px',
+              padding: '0 20px'
+            }}>
+              <h3 style={{ color: 'white', fontSize: '20px', fontWeight: '600', margin: 0 }}>
+                {imageModal.imageTitle}
+              </h3>
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <button
+                  onClick={() => downloadImage(imageModal.imageUrl, imageModal.imageTitle.replace(/\s+/g, '-').toLowerCase() + '.jpg')}
+                  style={{
+                    background: '#2563eb',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '10px 20px',
+                    fontSize: '16px',
+                    cursor: 'pointer',
+                    fontWeight: '600',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}
+                >
+                  📥 Download
+                </button>
+                <button
+                  onClick={closeImageModal}
+                  style={{
+                    background: '#ef4444',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '10px 20px',
+                    fontSize: '18px',
+                    cursor: 'pointer',
+                    fontWeight: '600'
+                  }}
+                >
+                  ✕ Close
+                </button>
+              </div>
+            </div>
+
+            {/* Image */}
+            <img
+              src={imageModal.imageUrl}
+              alt={imageModal.imageTitle}
+              style={{
+                maxWidth: '100%',
+                maxHeight: 'calc(95vh - 100px)',
+                objectFit: 'contain',
+                borderRadius: '12px',
+                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
+              }}
+              onError={handleImageError}
+            />
+
+            {/* Instructions */}
+            <p style={{
+              color: '#d1d5db',
+              fontSize: '14px',
+              marginTop: '16px',
+              textAlign: 'center'
+            }}>
+              Click outside the image or press the Close button to exit
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Assignment Modal */}
+      {showAssignModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            background: 'white',
+            borderRadius: '12px',
+            padding: '32px',
+            maxWidth: '500px',
+            width: '90%',
+            maxHeight: '90vh',
+            overflow: 'auto'
+          }}>
+            <h2 style={{ marginBottom: '20px', fontSize: '24px', fontWeight: '600' }}>Assign to Employee</h2>
+            
+            {employees.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '40px 20px' }}>
+                <p style={{ color: '#6b7280', marginBottom: '20px' }}>No employees available. Create employees first.</p>
+                <button
+                  onClick={() => setShowAssignModal(false)}
+                  className="btn btn-secondary"
+                >
+                  Close
+                </button>
+              </div>
+            ) : (
+              <>
+                <div style={{ marginBottom: '24px' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>Select Employee</label>
+                  <select
+                    value={selectedEmployee}
+                    onChange={(e) => setSelectedEmployee(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      border: '1px solid #d1d5db',
+                      borderRadius: '8px',
+                      fontSize: '16px'
+                    }}
+                  >
+                    <option value="">-- Choose an employee --</option>
+                    {employees.map(emp => (
+                      <option key={emp._id} value={emp._id}>
+                        {emp.name} ({emp.email}) - {emp.totalAssigned} assigned
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                
+                <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+                  <button
+                    onClick={() => {
+                      setShowAssignModal(false);
+                      setSelectedEmployee('');
+                    }}
+                    className="btn btn-secondary"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleAssign}
+                    className="btn btn-primary"
+                  >
+                    Assign Form
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

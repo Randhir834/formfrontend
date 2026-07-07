@@ -30,6 +30,8 @@ function Login({ setUser }) {
       // Redirect based on role
       if (userData.role === 'admin') {
         navigate('/admin');
+      } else if (userData.role === 'employee') {
+        navigate('/employee/dashboard');
       } else {
         navigate('/dashboard');
       }

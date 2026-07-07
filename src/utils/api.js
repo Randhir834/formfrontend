@@ -128,4 +128,16 @@ export const updateFormStatus = (id, data) => api.put(`/admin/forms/${id}/update
 });
 export const deleteFormAdmin = (id) => api.delete(`/admin/forms/${id}`);
 
+// Employee Management APIs
+export const createEmployee = (data) => api.post('/employee/create', data);
+export const getEmployeeList = () => api.get('/employee/list');
+export const deleteEmployee = (id) => api.delete(`/employee/${id}`);
+export const assignFormToEmployee = (formId, employeeId) => api.put(`/employee/assign/${formId}`, { employeeId });
+export const unassignForm = (formId) => api.put(`/employee/unassign/${formId}`);
+
+// Employee Dashboard APIs
+export const getMyAssignments = (params) => api.get('/employee/my-assignments', { params });
+export const getAssignmentDetail = (id) => api.get(`/employee/assignment/${id}`);
+export const getEmployeeStats = () => api.get('/employee/stats');
+
 export default api;

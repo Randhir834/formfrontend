@@ -4,6 +4,8 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import UserDashboard from './pages/UserDashboard';
 import AdminDashboard from './pages/AdminDashboard';
+import EmployeeDashboard from './pages/EmployeeDashboard';
+import EmployeeAssignmentDetail from './pages/EmployeeAssignmentDetail';
 import FormSubmission from './pages/FormSubmission';
 import FormEdit from './pages/FormEdit';
 import FormDetail from './pages/FormDetail';
@@ -22,7 +24,7 @@ function App() {
     }
   }, []);
 
-  const ProtectedRoute = ({ children, adminOnly = false }) => {
+  const ProtectedRoute = ({ children, adminOnly = false, employeeOnly = false }) => {
     const token = localStorage.getItem('token');
     const userData = localStorage.getItem('user');
     
@@ -33,6 +35,13 @@ function App() {
     if (adminOnly) {
       const user = JSON.parse(userData);
       if (user.role !== 'admin') {
+        return <Navigate to="/dashboard" />;
+      }
+    }
+
+    if (employeeOnly) {
+      const user = JSON.parse(userData);
+      if (user.role !== 'employee') {
         return <Navigate to="/dashboard" />;
       }
     }
@@ -97,6 +106,24 @@ function App() {
             element={
               <ProtectedRoute adminOnly={true}>
                 <AdminFormDetail />
+              </ProtectedRoute>
+            } 
+          />
+          
+          <Route 
+            path="/employee/dashboard" 
+            element={
+              <ProtectedRoute employeeOnly={true}>
+                <EmployeeDashboard user={user} setUser={setUser} />
+              </ProtectedRoute>
+            } 
+          />
+          
+          <Route 
+            path="/employee/assignment/:id" 
+            element={
+              <ProtectedRoute employeeOnly={true}>
+                <EmployeeAssignmentDetail user={user} />
               </ProtectedRoute>
             } 
           />
