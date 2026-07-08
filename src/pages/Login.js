@@ -37,7 +37,18 @@ function Login({ setUser }) {
       }
     } catch (err) {
       console.error('Login error:', err);
-      const errorMessage = err.response?.data?.message || err.message || 'Login failed. Please check your connection and try again.';
+      let errorMessage = 'Login failed. Please try again.';
+      
+      if (err.code === 'ERR_NETWORK' || err.message === 'Network Error') {
+        errorMessage = 'Cannot connect to server. Please ensure the backend is running on http://localhost:5001';
+      } else if (err.response?.data?.error) {
+        errorMessage = err.response.data.error;
+      } else if (err.response?.data?.message) {
+        errorMessage = err.response.data.message;
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+      
       setError(errorMessage);
     } finally {
       setLoading(false);
