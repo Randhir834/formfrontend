@@ -21,16 +21,16 @@ function Login({ setUser }) {
       console.log('Attempting login...');
       const response = await login(formData);
       console.log('Login response:', response);
-      const { token, ...userData } = response.data.data;
+      const { token, user } = response.data;
       
       localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(userData));
-      setUser(userData);
+      localStorage.setItem('user', JSON.stringify(user));
+      setUser(user);
 
       // Redirect based on role
-      if (userData.role === 'admin') {
+      if (user.role === 'admin') {
         navigate('/admin');
-      } else if (userData.role === 'employee') {
+      } else if (user.role === 'employee') {
         navigate('/employee/dashboard');
       } else {
         navigate('/dashboard');

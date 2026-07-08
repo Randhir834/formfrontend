@@ -21,11 +21,11 @@ function Signup({ setUser }) {
       console.log('Attempting signup...');
       const response = await signup(formData);
       console.log('Signup response:', response);
-      const { token, ...userData } = response.data.data;
+      const { token, user } = response.data;
       
       localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(userData));
-      setUser(userData);
+      localStorage.setItem('user', JSON.stringify(user));
+      setUser(user);
 
       navigate('/dashboard');
     } catch (err) {

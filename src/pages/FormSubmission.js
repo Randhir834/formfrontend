@@ -233,18 +233,9 @@ function FormSubmission() {
                 </div>
                 <div className="form-group">
                   <label>Product Name (Category) *</label>
-                  <select required value={formData.productInfo.productCategory}
-                    onChange={(e) => handleInputChange('productInfo', 'productCategory', e.target.value)}>
-                    <option value="">Select Product Name</option>
-                    <option value="beverages">Beverages</option>
-                    <option value="snacks">Snacks</option>
-                    <option value="dairy">Dairy</option>
-                    <option value="bakery">Bakery</option>
-                    <option value="confectionery">Confectionery</option>
-                    <option value="spices">Spices & Condiments</option>
-                    <option value="cereals">Cereals & Grains</option>
-                    <option value="other">Other</option>
-                  </select>
+                  <input required value={formData.productInfo.productCategory}
+                    onChange={(e) => handleInputChange('productInfo', 'productCategory', e.target.value)}
+                    placeholder="Enter product category" />
                 </div>
                 <div className="form-group">
                   <label>Product Variant</label>
