@@ -56,18 +56,6 @@ function EmployeeAssignmentDetail({ user }) {
   if (loading) return <div className="loading">Loading...</div>;
   if (!form) return <div className="error">Assignment not found</div>;
 
-  const renderSection = (title, data, keys) => (
-    <div className="form-section">
-      <h3>{title}</h3>
-      {keys.map(({ key, label }) => (
-        <div key={key} className="form-field">
-          <label>{label}:</label>
-          <p>{data?.[key] || 'N/A'}</p>
-        </div>
-      ))}
-    </div>
-  );
-
   const renderImages = (images, title) => {
     if (!images || images.length === 0) return null;
     
@@ -172,53 +160,276 @@ function EmployeeAssignmentDetail({ user }) {
           </div>
 
           {/* Client Information */}
-          {renderSection('Client Information', form.clientInfo, [
-            { key: 'companyName', label: 'Company Name' },
-            { key: 'brandName', label: 'Brand Name' },
-            { key: 'contactPerson', label: 'Contact Person' },
-            { key: 'email', label: 'Email' },
-            { key: 'phone', label: 'Phone' }
-          ])}
+          <div className="form-section">
+            <h3>Client Information</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px 40px' }}>
+              <div className="form-field">
+                <label>Company Name:</label>
+                <p>{form.clientInfo?.companyName || 'N/A'}</p>
+              </div>
+              <div className="form-field">
+                <label>Brand Name:</label>
+                <p>{form.clientInfo?.brandName || 'N/A'}</p>
+              </div>
+              <div className="form-field">
+                <label>Contact Person:</label>
+                <p>{form.clientInfo?.contactPerson || 'N/A'}</p>
+              </div>
+              <div className="form-field">
+                <label>Mobile Number:</label>
+                <p>{form.clientInfo?.mobileNumber || 'N/A'}</p>
+              </div>
+              <div className="form-field">
+                <label>Email:</label>
+                <p>{form.clientInfo?.email || 'N/A'}</p>
+              </div>
+              <div className="form-field">
+                <label>FSSAI Number:</label>
+                <p>{form.clientInfo?.fssaiNumber || 'N/A'}</p>
+              </div>
+              <div className="form-field">
+                <label>Manufacturer Name:</label>
+                <p>{form.clientInfo?.manufacturerName || 'N/A'}</p>
+              </div>
+              <div className="form-field" style={{ gridColumn: '1 / -1' }}>
+                <label>Manufacturer Address:</label>
+                <p>{form.clientInfo?.manufacturerAddress || 'N/A'}</p>
+              </div>
+              <div className="form-field">
+                <label>Marketed By:</label>
+                <p>{form.clientInfo?.marketedBy || 'N/A'}</p>
+              </div>
+              <div className="form-field" style={{ gridColumn: '1 / -1' }}>
+                <label>Marketed By Address:</label>
+                <p>{form.clientInfo?.marketedByAddress || 'N/A'}</p>
+              </div>
+            </div>
+          </div>
 
           {/* Product Information */}
-          {renderSection('Product Information', form.productInfo, [
-            { key: 'productName', label: 'Product Name' },
-            { key: 'category', label: 'Category' },
-            { key: 'description', label: 'Description' },
-            { key: 'usp', label: 'Unique Selling Points' }
-          ])}
+          <div className="form-section">
+            <h3>Product Information</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px 40px' }}>
+              <div className="form-field">
+                <label>Product Name:</label>
+                <p>{form.productInfo?.productName || 'N/A'}</p>
+              </div>
+              <div className="form-field">
+                <label>Product Category:</label>
+                <p>{form.productInfo?.productCategory || 'N/A'}</p>
+              </div>
+              <div className="form-field">
+                <label>Product Variant:</label>
+                <p>{form.productInfo?.productVariant || 'N/A'}</p>
+              </div>
+              <div className="form-field">
+                <label>Product Weight:</label>
+                <p>{form.productInfo?.productWeight || 'N/A'}</p>
+              </div>
+              <div className="form-field">
+                <label>Product Dimensions:</label>
+                <p>{form.productInfo?.productDimensions || 'N/A'}</p>
+              </div>
+              <div className="form-field">
+                <label>MRP:</label>
+                <p>{form.productInfo?.mrp ? `₹${form.productInfo.mrp}` : 'N/A'}</p>
+              </div>
+              <div className="form-field">
+                <label>Shelf Life:</label>
+                <p>{form.productInfo?.shelfLife || 'N/A'}</p>
+              </div>
+              <div className="form-field" style={{ gridColumn: '1 / -1' }}>
+                <label>Storage Instructions:</label>
+                <p>{form.productInfo?.storageInstructions || 'N/A'}</p>
+              </div>
+              <div className="form-field" style={{ gridColumn: '1 / -1' }}>
+                <label>Ingredients:</label>
+                <p style={{ whiteSpace: 'pre-wrap' }}>{form.productInfo?.ingredients || 'N/A'}</p>
+              </div>
+              <div className="form-field" style={{ gridColumn: '1 / -1' }}>
+                <label>Nutritional Facts:</label>
+                <p style={{ whiteSpace: 'pre-wrap' }}>{form.productInfo?.nutritionalFacts || 'N/A'}</p>
+              </div>
+              <div className="form-field" style={{ gridColumn: '1 / -1' }}>
+                <label>Allergen Information:</label>
+                <p style={{ whiteSpace: 'pre-wrap' }}>{form.productInfo?.allergenInformation || 'N/A'}</p>
+              </div>
+              <div className="form-field" style={{ gridColumn: '1 / -1' }}>
+                <label>Directions for Use:</label>
+                <p style={{ whiteSpace: 'pre-wrap' }}>{form.productInfo?.directionsForUse || 'N/A'}</p>
+              </div>
+            </div>
+          </div>
 
           {/* Target Customer */}
-          {renderSection('Target Customer', form.targetCustomer, [
-            { key: 'ageGroup', label: 'Age Group' },
-            { key: 'gender', label: 'Gender' },
-            { key: 'lifestyle', label: 'Lifestyle' },
-            { key: 'preferences', label: 'Preferences' }
-          ])}
+          <div className="form-section">
+            <h3>Target Customer</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px 40px' }}>
+              <div className="form-field">
+                <label>Gender:</label>
+                <p style={{ textTransform: 'capitalize' }}>{form.targetCustomer?.targetGender || 'N/A'}</p>
+              </div>
+              <div className="form-field">
+                <label>Age Group:</label>
+                <p style={{ textTransform: 'capitalize' }}>{form.targetCustomer?.targetAge || 'N/A'}</p>
+              </div>
+              <div className="form-field">
+                <label>Income Level:</label>
+                <p style={{ textTransform: 'capitalize' }}>{form.targetCustomer?.targetIncome || 'N/A'}</p>
+              </div>
+              <div className="form-field">
+                <label>Location Type:</label>
+                <p style={{ textTransform: 'capitalize' }}>{form.targetCustomer?.targetLocation || 'N/A'}</p>
+              </div>
+              <div className="form-field">
+                <label>Buyer Channel:</label>
+                <p style={{ textTransform: 'capitalize' }}>{form.targetCustomer?.buyerChannel || 'N/A'}</p>
+              </div>
+              <div className="form-field">
+                <label>Buyer Segment:</label>
+                <p style={{ textTransform: 'capitalize' }}>{form.targetCustomer?.buyerSegment || 'N/A'}</p>
+              </div>
+              <div className="form-field">
+                <label>Business Model:</label>
+                <p style={{ textTransform: 'capitalize' }}>{form.targetCustomer?.businessModel || 'N/A'}</p>
+              </div>
+            </div>
+          </div>
 
           {/* Package Specifications */}
-          {renderSection('Package Specifications', form.packageSpec, [
-            { key: 'packagingType', label: 'Packaging Type' },
-            { key: 'dimensions', label: 'Dimensions' },
-            { key: 'material', label: 'Material' },
-            { key: 'printingMethod', label: 'Printing Method' },
-            { key: 'quantity', label: 'Quantity' }
-          ])}
+          <div className="form-section">
+            <h3>Package Specifications</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px 40px' }}>
+              <div className="form-field">
+                <label>Package Type:</label>
+                <p style={{ textTransform: 'capitalize' }}>{form.packageSpec?.packageType || 'N/A'}</p>
+              </div>
+              <div className="form-field">
+                <label>Package Material:</label>
+                <p style={{ textTransform: 'capitalize' }}>{form.packageSpec?.packageMaterial || 'N/A'}</p>
+              </div>
+              <div className="form-field">
+                <label>Package Finish:</label>
+                <p style={{ textTransform: 'capitalize' }}>{form.packageSpec?.packageFinish || 'N/A'}</p>
+              </div>
+              <div className="form-field" style={{ gridColumn: '1 / -1' }}>
+                <label>Additional Notes:</label>
+                <p style={{ whiteSpace: 'pre-wrap' }}>{form.packageSpec?.packageNotes || 'N/A'}</p>
+              </div>
+            </div>
+          </div>
 
           {/* Design Direction */}
-          {renderSection('Design Direction', form.designDirection, [
-            { key: 'colorPreferences', label: 'Color Preferences' },
-            { key: 'style', label: 'Style' },
-            { key: 'typography', label: 'Typography' },
-            { key: 'imagery', label: 'Imagery' },
-            { key: 'additionalNotes', label: 'Additional Notes' }
-          ])}
+          <div className="form-section">
+            <h3>Design Direction</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px 40px' }}>
+              <div className="form-field">
+                <label>Primary Color:</label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '4px' }}>
+                  {form.designDirection?.primaryColor && form.designDirection.primaryColor !== 'N/A' && (
+                    <div style={{ width: '40px', height: '40px', borderRadius: '8px', background: form.designDirection.primaryColor, border: '1px solid #d1d5db' }}></div>
+                  )}
+                  <p>{form.designDirection?.primaryColor || 'N/A'}</p>
+                </div>
+              </div>
+              <div className="form-field">
+                <label>Secondary Color:</label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '4px' }}>
+                  {form.designDirection?.secondaryColor && form.designDirection.secondaryColor !== 'N/A' && (
+                    <div style={{ width: '40px', height: '40px', borderRadius: '8px', background: form.designDirection.secondaryColor, border: '1px solid #d1d5db' }}></div>
+                  )}
+                  <p>{form.designDirection?.secondaryColor || 'N/A'}</p>
+                </div>
+              </div>
+              <div className="form-field">
+                <label>Accent Color:</label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '4px' }}>
+                  {form.designDirection?.accentColor && form.designDirection.accentColor !== 'N/A' && (
+                    <div style={{ width: '40px', height: '40px', borderRadius: '8px', background: form.designDirection.accentColor, border: '1px solid #d1d5db' }}></div>
+                  )}
+                  <p>{form.designDirection?.accentColor || 'N/A'}</p>
+                </div>
+              </div>
+              <div className="form-field">
+                <label>Colors to Avoid:</label>
+                <p>{form.designDirection?.colorsToAvoid || 'N/A'}</p>
+              </div>
+              <div className="form-field">
+                <label>Typography Style:</label>
+                <p style={{ textTransform: 'capitalize' }}>{form.designDirection?.typographyStyle || 'N/A'}</p>
+              </div>
+              <div className="form-field">
+                <label>Design Density:</label>
+                <p style={{ textTransform: 'capitalize' }}>{form.designDirection?.designDensity || 'N/A'}</p>
+              </div>
+              <div className="form-field">
+                <label>Brand Perception:</label>
+                <p style={{ textTransform: 'capitalize' }}>{form.designDirection?.brandPerception || 'N/A'}</p>
+              </div>
+              <div className="form-field">
+                <label>Design Aesthetic:</label>
+                <p style={{ textTransform: 'capitalize' }}>{form.designDirection?.designAesthetic || 'N/A'}</p>
+              </div>
+              <div className="form-field">
+                <label>Visual Elements:</label>
+                <p style={{ textTransform: 'capitalize' }}>{form.designDirection?.visualElements || 'N/A'}</p>
+              </div>
+              <div className="form-field">
+                <label>Imagery Style:</label>
+                <p style={{ textTransform: 'capitalize' }}>{form.designDirection?.imageryStyle || 'N/A'}</p>
+              </div>
+              <div className="form-field" style={{ gridColumn: '1 / -1' }}>
+                <label>Design Inspiration:</label>
+                <p style={{ whiteSpace: 'pre-wrap' }}>{form.designDirection?.designInspiration || 'N/A'}</p>
+              </div>
+              <div className="form-field" style={{ gridColumn: '1 / -1' }}>
+                <label>Additional Design Notes:</label>
+                <p style={{ whiteSpace: 'pre-wrap' }}>{form.designDirection?.additionalNotes || 'N/A'}</p>
+              </div>
+            </div>
+          </div>
 
           {/* Timeline */}
-          {renderSection('Timeline', form.timeline, [
-            { key: 'projectDeadline', label: 'Project Deadline' },
-            { key: 'urgency', label: 'Urgency Level' }
-          ])}
+          <div className="form-section">
+            <h3>Timeline</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px 40px' }}>
+              <div className="form-field">
+                <label>Launch Date:</label>
+                <p>{form.timeline?.launchDate ? new Date(form.timeline.launchDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A'}</p>
+              </div>
+              <div className="form-field">
+                <label>Printing Date:</label>
+                <p>{form.timeline?.printingDate ? new Date(form.timeline.printingDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A'}</p>
+              </div>
+              <div className="form-field">
+                <label>Expected Delivery:</label>
+                <p>{form.timeline?.expectedDelivery ? new Date(form.timeline.expectedDelivery).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A'}</p>
+              </div>
+              <div className="form-field">
+                <label>Priority:</label>
+                <p>
+                  {form.timeline?.urgent ? (
+                    <span style={{ 
+                      padding: '4px 12px', 
+                      borderRadius: '6px', 
+                      background: form.timeline.urgent === 'yes' ? '#fee2e2' : '#f3f4f6', 
+                      color: form.timeline.urgent === 'yes' ? '#991b1b' : '#374151',
+                      display: 'inline-block',
+                      fontWeight: '500'
+                    }}>
+                      {form.timeline.urgent === 'yes' ? 'Urgent' : form.timeline.urgent === 'no' ? 'Standard' : 'Flexible'}
+                    </span>
+                  ) : (
+                    'N/A'
+                  )}
+                </p>
+              </div>
+              <div className="form-field" style={{ gridColumn: '1 / -1' }}>
+                <label>Timeline Notes:</label>
+                <p style={{ whiteSpace: 'pre-wrap' }}>{form.timeline?.timelineNotes || 'N/A'}</p>
+              </div>
+            </div>
+          </div>
 
           {/* Logo */}
           {form.logo && (
