@@ -120,6 +120,12 @@ export const submitFeedback = (formId, updateId, data) => api.post(`/forms/${for
   headers: { 'Content-Type': 'multipart/form-data' }
 });
 
+// Comment APIs (for direct comments on forms)
+export const addComment = (formId, data) => api.post(`/forms/${formId}/comments`, data, {
+  headers: { 'Content-Type': 'multipart/form-data' }
+});
+export const getComments = (formId) => api.get(`/forms/${formId}/comments`);
+
 // Admin APIs
 export const getAdminStats = () => api.get('/admin/stats');
 export const getAllForms = (params) => api.get('/admin/forms', { params });

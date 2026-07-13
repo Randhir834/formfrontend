@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getForm, submitFeedback, getImageUrl } from '../utils/api';
+import { getForm, submitFeedback, addComment, getComments, getImageUrl } from '../utils/api';
 import ImageModal from '../components/ImageModal';
 
 function FormDetail() {
@@ -10,6 +10,10 @@ function FormDetail() {
   const [loading, setLoading] = useState(true);
   const [feedbackData, setFeedbackData] = useState({});
   const [submittingFeedback, setSubmittingFeedback] = useState({});
+  const [comments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState('');
+  const [commentImages, setCommentImages] = useState([]);
+  const [submittingComment, setSubmittingComment] = useState(false);
   const [imageModal, setImageModal] = useState({
     isOpen: false,
     imageUrl: '',
@@ -18,6 +22,7 @@ function FormDetail() {
 
   useEffect(() => {
     fetchForm();
+    fetchComments();
   }, [id]);
 
   const fetchForm = async () => {
@@ -29,6 +34,15 @@ function FormDetail() {
       navigate('/dashboard');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchComments = async () => {
+    try {
+      const response = await getComments(id);
+      setComments(response.data.data);
+    } catch (error) {
+      console.error('Error fetching comments:', error);
     }
   };
 
@@ -90,6 +104,47 @@ function FormDetail() {
       alert('Error submitting feedback: ' + (error.response?.data?.message || error.message));
     } finally {
       setSubmittingFeedback(prev => ({ ...prev, [updateId]: false }));
+    }
+  };
+
+  const handleCommentImageChange = (e) => {
+    const files = Array.from(e.target.files).slice(0, 5);
+    setCommentImages(files);
+  };
+
+  const handleSubmitComment = async (e) => {
+    e.preventDefault();
+    
+    if (!newComment || newComment.trim() === '') {
+      alert('Please enter a comment');
+      return;
+    }
+
+    setSubmittingComment(true);
+
+    try {
+      const data = new FormData();
+      data.append('comment', newComment);
+      
+      if (commentImages && commentImages.length > 0) {
+        commentImages.forEach((file) => {
+          data.append('feedbackImages', file);
+        });
+      }
+
+      await addComment(id, data);
+      alert('Comment added successfully!');
+      
+      // Reset comment form
+      setNewComment('');
+      setCommentImages([]);
+      
+      // Refresh comments
+      fetchComments();
+    } catch (error) {
+      alert('Error adding comment: ' + (error.response?.data?.message || error.message));
+    } finally {
+      setSubmittingComment(false);
     }
   };
 
@@ -437,6 +492,132 @@ function FormDetail() {
               <p style={{ color: '#6b7280', fontSize: '14px' }}>The admin will post updates here as they work on your submission</p>
             </div>
           )}
+
+          {/* Comments & Discussion Section */}
+          <div style={{ marginTop: '48px', paddingTop: '48px', borderTop: '2px solid #f3f4f6' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+              <div>
+                <h3 style={{ color: '#111827', fontSize: '20px', fontWeight: '600', marginBottom: '4px' }}>Comments & Discussion</h3>
+                <p style={{ color: '#6b7280', fontSize: '14px' }}>Add comments, ask questions, or provide additional information</p>
+              </div>
+              <span style={{ fontSize: '13px', fontWeight: '600', color: '#2563eb', background: '#eff6ff', padding: '6px 12px', borderRadius: '20px' }}>
+                {comments.length} {comments.length === 1 ? 'Comment' : 'Comments'}
+              </span>
+            </div>
+
+            {/* Add New Comment Form */}
+            <div style={{ background: '#f9fafb', padding: '24px', borderRadius: '12px', marginBottom: '24px', border: '1px solid #e5e7eb' }}>
+              <h4 style={{ fontSize: '15px', fontWeight: '600', color: '#111827', marginBottom: '16px' }}>Add a comment</h4>
+              <form onSubmit={handleSubmitComment}>
+                <div className="form-group" style={{ marginBottom: '12px' }}>
+                  <textarea
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    placeholder="Share your thoughts, questions, or additional information..."
+                    rows="4"
+                    style={{ fontSize: '14px' }}
+                  />
+                </div>
+                <div className="form-group" style={{ marginBottom: '12px' }}>
+                  <label style={{ fontSize: '13px', fontWeight: '500' }}>Attach images (optional, up to 5)</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleCommentImageChange}
+                    style={{ padding: '8px', fontSize: '13px' }}
+                  />
+                  {commentImages && commentImages.length > 0 && (
+                    <div className="image-preview" style={{ marginTop: '12px' }}>
+                      {commentImages.map((file, imgIdx) => (
+                        <img key={imgIdx} src={URL.createObjectURL(file)} alt={`Preview ${imgIdx + 1}`} style={{ borderRadius: '8px', border: '1px solid #e5e7eb', maxHeight: '100px' }} />
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <button 
+                  type="submit" 
+                  className="btn btn-primary" 
+                  style={{ padding: '10px 20px', fontSize: '14px' }}
+                  disabled={submittingComment}
+                >
+                  {submittingComment ? 'Posting...' : 'Post Comment'}
+                </button>
+              </form>
+            </div>
+
+            {/* Comments List */}
+            {comments.length > 0 ? (
+              <div>
+                {comments.map((comment) => (
+                  <div key={comment.id} style={{ background: 'white', padding: '20px', borderRadius: '12px', marginBottom: '16px', border: '1px solid #e5e7eb' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                      <div style={{ 
+                        width: '40px', 
+                        height: '40px', 
+                        borderRadius: '50%', 
+                        background: comment.users?.role === 'admin' ? '#2563eb' : comment.users?.role === 'employee' ? '#7c3aed' : '#10b981',
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center', 
+                        color: 'white', 
+                        fontWeight: '600', 
+                        fontSize: '16px' 
+                      }}>
+                        {comment.users?.role === 'admin' ? 'A' : comment.users?.role === 'employee' ? 'E' : 'U'}
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <p style={{ fontSize: '15px', fontWeight: '600', color: '#111827', marginBottom: '2px' }}>
+                          {comment.users?.name}
+                          {comment.users?.role && (
+                            <span style={{ 
+                              marginLeft: '8px', 
+                              fontSize: '11px', 
+                              fontWeight: '600', 
+                              textTransform: 'uppercase', 
+                              color: comment.users.role === 'admin' ? '#2563eb' : comment.users.role === 'employee' ? '#7c3aed' : '#10b981',
+                              background: comment.users.role === 'admin' ? '#eff6ff' : comment.users.role === 'employee' ? '#f3e8ff' : '#d1fae5',
+                              padding: '2px 8px',
+                              borderRadius: '4px'
+                            }}>
+                              {comment.users.role}
+                            </span>
+                          )}
+                        </p>
+                        <p style={{ fontSize: '13px', color: '#6b7280' }}>
+                          {new Date(comment.created_at).toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                        </p>
+                      </div>
+                    </div>
+                    <p style={{ fontSize: '15px', color: '#111827', lineHeight: '1.6', marginBottom: '8px', whiteSpace: 'pre-wrap' }}>{comment.comment}</p>
+                    {comment.feedback_images && comment.feedback_images.length > 0 && (
+                      <div className="image-preview" style={{ marginTop: '12px' }}>
+                        {comment.feedback_images.map((img, imgIdx) => {
+                          const imageUrl = getImageUrl(img.publicUrl || img.imageUrl);
+                          return (
+                            <div 
+                              key={imgIdx} 
+                              style={{ position: 'relative', cursor: 'pointer', borderRadius: '8px', overflow: 'hidden' }}
+                              onClick={() => openImageModal(imageUrl, `Comment Image ${imgIdx + 1}`)}
+                            >
+                              <img src={imageUrl} alt={`Comment ${imgIdx + 1}`} style={{ borderRadius: '8px', border: '1px solid #e5e7eb', width: '100%', height: '100%', objectFit: 'cover' }} />
+                              <div style={{ position: 'absolute', bottom: '4px', right: '4px', background: 'rgba(0,0,0,0.7)', color: 'white', padding: '2px 6px', borderRadius: '4px', fontSize: '11px', fontWeight: '600' }}>
+                                Click to enlarge
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div style={{ textAlign: 'center', padding: '40px 20px', background: 'white', borderRadius: '12px', border: '1px dashed #e5e7eb' }}>
+                <p style={{ color: '#6b7280', fontSize: '14px' }}>No comments yet. Be the first to add a comment!</p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
